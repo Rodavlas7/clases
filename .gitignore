@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+jdk*/
+oracleJdk*/
+*.jar
+*.class
+*.db
+node_modules/
