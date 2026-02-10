@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Registro</title>
+    <link rel="stylesheet" href="{% static 'estilo.css' %}">
+</head>
+
+<body>
+    <h1>Formulario de Registro</h1>
+    <p>Complete el siguiente formulario con sus datos personales.</p>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Nombre Completo:</label><br>
+        <input type="text" name="nombre" required>
+        <br><br>
+
+        <label>Correo Electrónico:</label><br>
+        <input type="email" name="correo" required>
+        <br><br>
+
+        <label>Contraseña:</label><br>
+        <input type="password" name="clave" required>
+        <br><br>
+
+        <label>Género:</label><br>
+        <input type="radio" name="genero" value="masculino"> Masculino<br>
+        <input type="radio" name="genero" value="femenino"> Femenino
+        <br><br>
+
+        <input type="checkbox" name="terminos" required>
+        Acepto los términos y condiciones
+        <br><br>
+
+        <label>Comentarios:</label><br>
+        <textarea name="comentarios"></textarea>
+        <br><br>
+
+        <button type="submit">Enviar</button>
+    </form>
+
+</body>
+</html>
