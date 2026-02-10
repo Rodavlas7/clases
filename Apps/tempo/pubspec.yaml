@@ -1,0 +1,27 @@
+name: tempo
+description: Temporizador academico
+publish_to: "none"
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wakelock_plus: ^1.2.5
+  audioplayers: ^5.2.1
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/sounds/OOT_Navi_Listen1.wav
+    - assets/sounds/OOT_Navi_Listen2.wav
+    - assets/sounds/OOT_Navi_Listen3.wav
+    - assets/sounds/OOT_Navi_Listen4.wav
+    - assets/sounds/OOT_Navi_Listen5.wav
+    - assets/sounds/OOT_Navi_Hey1.wav
+    - assets/sounds/OOT_Navi_Hey2.wav
+    - assets/sounds/OOT_Navi_Hey3.wav
+    - assets/sounds/OOT_Navi_Hey4.wav
+    - assets/sounds/OOT_Navi_Hey5.wav
