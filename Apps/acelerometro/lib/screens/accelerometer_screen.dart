@@ -31,6 +31,7 @@ class _AccelerometerScreenState extends State<AccelerometerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromRGBO(255, 230, 213, 1),
       appBar: AppBar(
         title: const Text('Accelerometer Example'),
         centerTitle: true,
