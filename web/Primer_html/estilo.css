@@ -1,12 +1,17 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: #feefe9;
-    background-size: cover;
     margin: 0;
-    padding: 0px;
+    padding: 0;
+    min-height: 100vh;
+    transition: background-color 0.4s ease-in-out;
 }
 
-h1 
-{
+
+body:hover {
+    background-color: black;
+}
+
+h1 {
     text-align: center;
 }
