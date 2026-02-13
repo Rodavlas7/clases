@@ -7,11 +7,6 @@ body {
     transition: background-color 0.4s ease-in-out;
 }
 
-
-body:hover {
-    background-color: black;
-}
-
 h1 {
     text-align: center;
 }
