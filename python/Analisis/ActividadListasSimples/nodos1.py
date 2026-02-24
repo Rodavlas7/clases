@@ -1,9 +1,11 @@
 import random
 
 class nodo:
-    def __init__(self, dato, siguiente = None, posicion = None):
+    def __init__(self, dato, siguiente = None, posicion = None, anterior = None):
         self.__dato = dato
         self.__siguiente = siguiente
+        self.__posicion = posicion
+        self.__anterior = anterior
 
     @property
     def posicion(self):
@@ -22,6 +24,14 @@ class nodo:
         self.__siguiente = siguiente
 
     @property
+    def anterior(self):
+        return self.__anterior
+    
+    @anterior.setter
+    def anterior(self, anterior):
+        self.__anterior = anterior
+
+    @property
     def dato(self):
         return self.__dato
     
@@ -30,7 +40,7 @@ class nodo:
         self.__dato = dato
 
     def __str__(self):
-        return f"Tiene valor de: {self.__dato} \n Tiene posicion de: {self.__posicion} \n Tiene siguiente: {self.__siguiente}\n"
+        return f"Tiene valor de: {self.__dato} \n Tiene posicion de: {self.__posicion} \n Tiene siguiente: {self.__siguiente}\n Tiene anterior: {self.__anterior}\n"
 
 class memoria: 
     def __init__(self): 
@@ -39,20 +49,23 @@ class memoria:
         self.__cantidad = 0
         self.__posicionmax = 0
 
-    def agregar(self, nodo):
-        nodo.posicion = random.randint(self.__posicionmax, self.__posicionmax + 10)
-        self.__posicionmax = nodo.posicion + 1
 
+    def agregar_final(self, nodo):
+        nodo.posicion = self.__posicionmax
+        self.__posicionmax = nodo.posicion + 1
+        
         if self.__cantidad == 0:
             self.__raiz = nodo
             self.__nodos.append(nodo)
             self.__cantidad += 1
-            return
+            return  
         else:
             self.__nodos.append(nodo)
             self.__nodos[self.__cantidad - 1].siguiente = nodo.posicion
+            nodo.anterior = self.__nodos[self.__cantidad - 1].posicion
             self.__cantidad += 1
             return
+        
         
     def mostrar(self):
         if self.__cantidad == 0:
@@ -70,12 +83,44 @@ class memoria:
             if i.posicion == posicion:
                 return i
         return None
+    
+
+    def elminar(self, posicion):
+        if self.__cantidad == 0:
+            return
+        
+        for anterior in self.__nodos:
+            if anterior.siguiente == posicion:
+
+                for siguiente in self.__nodos:
+                    if siguiente.anterior == posicion:
+
+                        for elim in self.__nodos:
+                            if elim.posicion == posicion:
+                                anterior.siguiente = elim.siguiente
+                                siguiente.anterior = elim.anterior
+
+                                elim.siguiente = None
+                                elim.anterior = None
+
+                                self.__cantidad =- 1
+                                
+                                return 'nodo eliminado'
+
+        return 'No se encontro el nodo'
+
+                
+
+
 
 def main():
     memoria1 = memoria()
     for i in range(5):
         nodo1 = nodo(i)
-        memoria1.agregar(nodo1)
+        memoria1.agregar_final(nodo1)
+    memoria1.mostrar()
+    memoria1.elminar(3)
+    print("\n\n\n\n")
     memoria1.mostrar()
 
 if __name__ == "__main__":    
