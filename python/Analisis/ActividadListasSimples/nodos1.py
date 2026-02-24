@@ -32,7 +32,7 @@ class nodo:
     def __str__(self):
         return f"Tiene valor de: {self.__dato} \n Tiene posicion de: {self.__posicion} \n Tiene siguiente: {self.__siguiente}\n"
 
-class lista: 
+class memoria: 
     def __init__(self): 
         self.__raiz = None
         self.__nodos = []
@@ -72,11 +72,11 @@ class lista:
         return None
 
 def main():
-    lista1 = lista()
+    memoria1 = memoria()
     for i in range(5):
         nodo1 = nodo(i)
-        lista1.agregar(nodo1)
-    lista1.mostrar()
+        memoria1.agregar(nodo1)
+    memoria1.mostrar()
 
 if __name__ == "__main__":    
     main()
