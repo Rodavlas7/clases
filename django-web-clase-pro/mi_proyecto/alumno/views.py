@@ -6,5 +6,4 @@ from .models import Alumno
 
 def lista_alumnos(request):
     alumnos = Alumno.objects.all()
-    return render(request, 'alumno/lista_alumnos.html', {'alumnos': alumnos})
-
+    return render(request, 'lista_alumnos.html', {'alumnos': alumnos})
