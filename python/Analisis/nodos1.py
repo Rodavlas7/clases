@@ -88,8 +88,6 @@ class memoria:
             print(nodo_actual)
             nodo_actual = self.buscar(nodo_actual.anterior)
 
-
-
     def buscar(self, posicion):
         if self.__cantidad == 0:
             return None
@@ -181,13 +179,10 @@ class memoria:
 
 
 m = memoria()
-
 # Agregamos 5 nodos
 for x in [10, 20, 30, 40, 50]:
     m.agregar_final(nodo(x))
-    
 print("--- Mostrar normal (Adelante hacia atrás) ---")
 m.mostrar()
-
 print("\n--- Mostrar al revés (Atrás hacia adelante) ---")
 m.mostrarReves()

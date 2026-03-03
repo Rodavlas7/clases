@@ -42,11 +42,11 @@ def crearMatrizTTT():
             filas.append("")
         matriz.append(filas)
 
-    contador = 1
+    contador = 9
     for i in range(len(matriz)):
         for j in range(len(matriz[i])):
             matriz[i][j] = contador
-            contador += 1    
+            contador -= 1    
     return matriz
 
 m = crearMatrizTTT()
