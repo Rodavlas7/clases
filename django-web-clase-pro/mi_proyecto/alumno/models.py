@@ -5,7 +5,7 @@ from django.db import models
 class Alumno(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
-    email = models.EmailField()
+    edad = models.IntegerField()
     matricula = models.CharField(max_length=20, unique=True)
 
     def __str__(self):
