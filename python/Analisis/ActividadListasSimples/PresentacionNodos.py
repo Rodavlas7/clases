@@ -49,8 +49,6 @@ class memoria:
         self.__cantidad = 0
         self.__posicionmax = 0
 
-
-
     def agregar_final(self, nodo):
         nodo.posicion = self.__posicionmax
         self.__posicionmax = nodo.posicion + 1
@@ -118,7 +116,6 @@ class memoria:
 
         eliminado = None
 
-        # buscar nodo a eliminar
         for elim in self.__nodos:
             if elim.posicion == posicion:
                 eliminado = elim
@@ -182,6 +179,7 @@ class memoria:
         return "Nodo insertado"
 
 
+# Prueba de mostrar al revés
 m = memoria()
 
 # Agregamos 5 nodos
