@@ -1,5 +1,3 @@
-import random
-
 class nodo:
     def __init__(self, dato, siguiente = None, posicion = None, anterior = None):
         self.__dato = dato
@@ -83,7 +81,7 @@ class memoria:
         if self.__cantidad == 0:
             return
         nodo_actual = self.__raiz
-        while nodo_actual is not None:
+        while nodo_actual.siguiente is not None:
             nodo_actual = self.buscar(nodo_actual.siguiente)
 
         while nodo_actual is not None:
