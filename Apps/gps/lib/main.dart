@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 void main() => runApp(const MyApp());
 
@@ -9,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Material App',
       home: locationScreen(),
     );
@@ -24,8 +27,12 @@ class locationScreen extends StatefulWidget {
 }
 
 class _locationScreenState extends State<locationScreen> {
-  String latitud = "No disponible";
-  String longituf = "No disponible";
+  //String latitud = "No disponible";
+  //String longituf = "No disponible";
+
+  LatLng _currentPosition = LatLng(19.4326, -99.1332);
+
+  final MapController _mapController = MapController();
 
   Future<void> obtenerUbicacion() async {
     bool servicioHabilitado;
@@ -54,8 +61,8 @@ class _locationScreenState extends State<locationScreen> {
     );
 
     setState(() {
-      latitud = posicion.latitude.toString();
-      longituf = posicion.longitude.toString();
+      _currentPosition = LatLng(posicion.latitude, posicion.longitude);
+      _mapController.move(_currentPosition, 15.0);
     });
 
   }
@@ -66,19 +73,39 @@ class _locationScreenState extends State<locationScreen> {
       appBar: AppBar(
         title: const Text('Ubiubi nomi'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Latitud: $latitud"),
-            Text("Longitud: $longituf"),
-            ElevatedButton(
-              onPressed: obtenerUbicacion, 
-              child: const Text("Obtener Ubicación")
-            )
-          ],
+      
+      body: FlutterMap(
+        mapController: _mapController,
+        options: MapOptions(
+          center: _currentPosition, 
+          zoom: 14.0,
         ),
-      ), 
+        
+        children: [
+          TileLayer(
+            urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            userAgentPackageName: "com.victus.ubiubi_nomi", 
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: _currentPosition,
+                width: 80.0,
+                height: 80.0,
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.red,
+                  size: 40,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: obtenerUbicacion,
+        child: const Icon(Icons.my_location),
+      ),
     );
   }
 }
