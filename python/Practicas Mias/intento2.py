@@ -112,8 +112,6 @@ class Memoria():
             n = n.siguiente
 
 
-                
-
 
     def mostrar(self):
         if self.__raiz == None:
@@ -153,3 +151,5 @@ if __name__ == "__main__":
     if nodo_61 != None:
         lista.agregar(Nodo(65), nodo_61.posicion)
     lista.mostrar()
+
+    
