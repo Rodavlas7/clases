@@ -1,0 +1,31 @@
+pilas = []
+
+pilas.append("A")#appen de todo el abecedario
+pilas.append("B")
+pilas.append("C")
+pilas.append("D")
+pilas.append("E")
+pilas.append("F")
+pilas.append("G")
+pilas.append("H")
+pilas.append("I")
+pilas.append("J")
+pilas.append("K")
+pilas.append("L")
+pilas.append("M")
+pilas.append("N")
+pilas.append("O")
+pilas.append("P")
+pilas.append("Q")
+pilas.append("R")
+pilas.append("S")
+pilas.append("T")
+pilas.append("U")
+pilas.append("V")
+pilas.append("W")
+pilas.append("X")
+pilas.append("Y")
+pilas.append("Z")
+
+for i in pilas:
+    print(pilas.pop)
