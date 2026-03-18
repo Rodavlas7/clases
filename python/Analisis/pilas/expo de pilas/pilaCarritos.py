@@ -24,7 +24,7 @@ class PilaCarritos:
             return None
         else:
             self.tope -= 1
-            return self.pila.pop()
+            return self.pila.pop() #eliminar y devolver el ultimo carrito almacenado
 
     def mostrar(self):
         if self.esta_vacia():

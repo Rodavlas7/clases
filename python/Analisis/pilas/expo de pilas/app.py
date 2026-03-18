@@ -1,19 +1,17 @@
 import os
-from colorama import init, Fore, Style # Importamos colorama
+from colorama import init, Fore, Style 
 from carrito import Carrito
 from pilaCarritos import PilaCarritos
 
-# Inicializamos colorama para que los colores se reinicien automáticamente tras cada print
 init(autoreset=True)
 
 def limpiar():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def repetir():
-    # Usamos amarillo para las preguntas de entrada
     return input(Fore.YELLOW + "\n¿Desea repetir el proceso? (s/n): " + Style.RESET_ALL).lower() == 's'
 
-# Crear pilas
+# --- Creación de las 3 pilas con su capacidad máxima ---
 normales = PilaCarritos(10)
 bebe = PilaCarritos(5)
 pequenos = PilaCarritos(5)
@@ -38,10 +36,7 @@ def seleccionar_tipo():
         return None, None
 
 while True:
-
     limpiar()
-
-    # Título principal resaltado
     print(Fore.CYAN + Style.BRIGHT + "===== SISTEMA DE CARRITOS =====")
     print("1. Ingresar carrito")
     print("2. Retirar carrito")
@@ -50,7 +45,7 @@ while True:
 
     opcion = input(Fore.YELLOW + "\nSeleccione una opción: " + Style.RESET_ALL)
 
-    # INGRESAR
+    # --- OPCIÓN 1: PUSH ---
     if opcion == "1":
         while True:
             limpiar()
@@ -60,27 +55,26 @@ while True:
                 print(Fore.RED + "Tipo inválido")
                 break
 
-            if pila.esta_llena():
+            if pila.esta_llena(): # Evita desbordamiento (Stack Overflow)
                 print(Fore.RED + "\nNo hay espacio disponible en esta fila.")
             else:
                 codigo = f"C{contador}"
                 carrito = Carrito(codigo, tipo)
 
-                pila.push(carrito)
+                pila.push(carrito) # Agrega el carrito a la fila
 
-                # Éxitos en verde
                 print(Fore.GREEN + f"\nCarrito agregado en posición {pila.tope + 1}")
                 print(Fore.GREEN + f"Código asignado: {codigo}")
 
                 if pila.esta_llena():
-                    print(Fore.YELLOW + "La fila se ha llenado.") # Advertencia visual
+                    print(Fore.YELLOW + "La fila se ha llenado.")
 
                 contador += 1
 
             if not repetir():
                 break
 
-    # RETIRAR
+    # --- OPCIÓN 2: POP ---
     elif opcion == "2":
         while True:
             limpiar()
@@ -90,25 +84,22 @@ while True:
                 print(Fore.RED + "Tipo inválido")
                 break
 
-            carrito = pila.pop()
+            carrito = pila.pop() # Lógica LIFO: Last In, First Out
 
-            if carrito is None:
+            if carrito is None: # Evita Underflow
                 print(Fore.RED + "\nNo hay carritos disponibles para retirar.")
             else:
-                # Éxitos en verde
                 print(Fore.GREEN + f"\nSe retiró el carrito {carrito.codigo}")
                 print(Fore.GREEN + f"Ocupaba la posición {pila.tope + 2}")
 
             if not repetir():
                 break
 
-    # MOSTRAR
+    # --- OPCIÓN 3: MOSTRAR ---
     elif opcion == "3":
         limpiar()
-
         print(Fore.CYAN + Style.BRIGHT + "===== CARRITOS DISPONIBLES =====")
 
-        # Categorías en un color distinto (Magenta)
         print(Fore.MAGENTA + "\nCarritos Normales:", normales.total())
         normales.mostrar()
 
@@ -120,7 +111,7 @@ while True:
 
         input(Fore.YELLOW + "\nPresione ENTER para regresar al menú..." + Style.RESET_ALL)
 
-    # SALIR
+    # --- OPCIÓN 4: SALIR ---
     elif opcion == "4":
         print(Fore.CYAN + "\nSaliendo del sistema... ¡Hasta luego!")
         break
