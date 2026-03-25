@@ -1,3 +1,4 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'models/bank.dart';
 import 'services/api_service.dart';
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Material App',
       home: BankScreen(),
@@ -31,7 +32,7 @@ class _BankScreenState extends State<BankScreen> {
   @override
   void initState() {
     super.initState();
-    banks = ApiService.obtenerBanks();
+    banks = ApiService.obtenerBancos();
   }
 
   @override
@@ -44,13 +45,15 @@ class _BankScreenState extends State<BankScreen> {
         future: banks,
         builder: (context, snapshot){
           if (snapshot.hasData) {
-            return ListView.builder(
+            // Changed ListView.builder to standard ListView
+            return ListView(
               children: snapshot.data!.map(
                 (p) => ListTile(
                   title: Text(p.name),
-                  subtitle: Text(p.status),
-                ).toList(),
-              ),
+                  // Converted boolean status to String
+                  subtitle: Text(p.status ? "Active" : "Inactive"), 
+                ),
+              ).toList(),
             );
 
           } else if (snapshot.hasError){
@@ -64,14 +67,17 @@ class _BankScreenState extends State<BankScreen> {
         }
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: {} async {
-          await Apiservice.crearBank(
-            Bank(name: "New Bank" , status: true)
+        // Fixed parentheses syntax for the anonymous function
+        onPressed: () async { 
+          // Fixed capital "S" in ApiService
+          await ApiService.crearBanco( 
+            Bank(name: "New Bank", status: true)
           );
           setState(() {
-            banks = ApiService.obtenerBanks();
+            banks = ApiService.obtenerBancos();
           });
         },
+        child: const Icon(Icons.add),
       ),
     );
   }

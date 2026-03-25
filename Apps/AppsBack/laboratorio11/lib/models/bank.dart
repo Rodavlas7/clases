@@ -1,10 +1,8 @@
-import 'package:flutter/material.dart';
-import 'dart:ffi';
-
+// models/bank.dart
 class Bank {
   final int? id;
   final String name;
-  final Bool status;
+  final bool status; // Changed from Bool to bool
 
   Bank({this.id, required this.name, required this.status});
 
