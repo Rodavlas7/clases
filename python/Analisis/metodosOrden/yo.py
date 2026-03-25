@@ -7,7 +7,6 @@ def bubble(lista):
     l = len(lista)
     checks = 0
     swaps = 0
-    print(lista)
     for i in range(l):
         for j in range(l-1-i):
             checks += 1
@@ -56,13 +55,19 @@ def mergeRecursivo(lista):
 
 
 lista = []
-for i in range(20): lista.append(i) 
+for i in range(45): lista.append(i) 
 
 lista_original = random.sample(lista, len(lista))
 
+print("Lista original:")
+print(lista_original)
+
 print(" BURBUJA ")
-bubble(lista_original.copy())
+print(bubble(lista_original.copy()))
+
+print()
+print()
 
 print(" MERGE RECURSIVO ")
-mergeRecursivo(lista_original.copy())
+print(mergeRecursivo(lista_original.copy()))
 print(f"\nMerge  -> Checks: {merge_checks} | Swaps: {merge_moves}")
