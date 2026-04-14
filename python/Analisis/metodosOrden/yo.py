@@ -1,4 +1,6 @@
 import random
+import time
+from colorama import Fore, Style
 
 merge_checks = 0
 merge_moves = 0
@@ -13,6 +15,8 @@ def bubble(lista):
             if lista[j] > lista[j+1]: 
                 swaps += 1
                 lista[j], lista[j+1] = lista[j+1], lista[j]
+                print(lista)
+                time.sleep(0.01)
                 
     print(f"\nBubble -> Checks: {checks} | Swaps: {swaps}\n")
     return lista
@@ -23,6 +27,9 @@ def merge(izquierda, derecha):
 
     i, j = 0, 0
 
+    print("\n\n",izquierda, derecha)
+    print()
+
     while i < len(izquierda) and j < len(derecha):
         merge_checks += 1
         if izquierda[i] < derecha[j]:
@@ -32,11 +39,15 @@ def merge(izquierda, derecha):
             final.append(derecha[j])
             j += 1
         merge_moves += 1
+        print("Final", final)
+        time.sleep(0.01)
             
     merge_moves += len(izquierda[i:]) + len(derecha[j:])
     
     final.extend(izquierda[i:])
     final.extend(derecha[j:])
+
+    print("Final", final)
 
     return final
 
@@ -51,11 +62,8 @@ def mergeRecursivo(lista):
     return merge(izquierda, derecha)
 
 
-
-
-
 lista = []
-for i in range(45): lista.append(i) 
+for i in range(20): lista.append(i) 
 
 lista_original = random.sample(lista, len(lista))
 
