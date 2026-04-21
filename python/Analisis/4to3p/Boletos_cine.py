@@ -1,5 +1,5 @@
-
-import time  # solo para pequeñas animaciones de pausas
+## CINETOBI — Sistema de Venta y Control de Boletos de Cine ##
+## Estructuras de datos: Cola, Pila, Ordenamiento Burbuja, Busqueda Secuencial ##
 
 
 ## Pequeña cartelera ##
@@ -42,12 +42,14 @@ preventa_info = {
 ## Estructuras de datos para el sistema de boletos ##
 
 # COLA: clientes esperando en la fila para ser atendidos
+# Principio FIFO — el primero en entrar es el primero en ser atendido
 fila_clientes = []
 
 # COLA DE PREVENTA: clientes anotados para la proxima preventa
 fila_preventa = []
 
 # PILA: historial de transacciones completadas
+# Principio LIFO — la ultima transaccion es la primera en consultarse o deshacerse
 historial_transacciones = []
 
 # Lista de todos los boletos vendidos (para ordenar y buscar)
@@ -59,29 +61,34 @@ id_boleto_actual = 1
 # Contador para IDs de registro en preventa
 id_preventa_actual = 1
 
-# Asientos ocupados por pelicula
+# Diccionario que guarda que asientos estan ocupados por pelicula
 asientos_ocupados = {1: [], 2: [], 3: []}
 
 
-## Funciones para cola ##
+## ============================================================ ##
+##                     FUNCIONES DE COLA                        ##
+## ============================================================ ##
 
 def encolar_cliente(nombre, id_cliente):
-    # meto al cliente al final de la fila
+    # Inserta al cliente al FINAL de la fila (operacion enqueue)
     cliente = {"id_cliente": id_cliente, "nombre": nombre}
     fila_clientes.append(cliente)
 
 def desencolar_cliente():
-    # saco al primero de la fila
+    # Saca al cliente del FRENTE de la fila (operacion dequeue)
+    # Retorna None si la fila esta vacia
     if len(fila_clientes) == 0:
         return None
     return fila_clientes.pop(0)
 
 
-## Cola en preventa ##
+## ============================================================ ##
+##                   FUNCIONES DE COLA PREVENTA                 ##
+## ============================================================ ##
 
 def encolar_preventa(nombre, contacto):
+    # Registra al cliente al final de la fila de preventa
     global id_preventa_actual
-    # registro al cliente en la fila de preventa con su contacto (correo o tel)
     registro = {
         "id_preventa": id_preventa_actual,
         "nombre": nombre,
@@ -92,25 +99,26 @@ def encolar_preventa(nombre, contacto):
     return registro
 
 def cancelar_preventa(id_p):
-    # busco y saco al cliente de la fila de preventa si decide cancelar
+    # Busca y elimina un registro de preventa por su ID
+    # Retorna el registro eliminado o None si no existe
     for i in range(len(fila_preventa)):
         if fila_preventa[i]["id_preventa"] == id_p:
             cancelado = fila_preventa.pop(i)
             return cancelado
-    return None  # no lo encontre
+    return None
 
 
-
-## VER AMBAS FILAS (cola normal + cola preventa) ""
-
+## ============================================================ ##
+##                 VER AMBAS COLAS (atencion + preventa)        ##
+## ============================================================ ##
 
 def ver_fila():
-    # se muestran las dos colas juntas para tener una vista completa del estado
+    # Muestra el estado actual de la cola de atencion y la cola de preventa
     print("\n  " + "="*48)
     print("   ESTADO DE FILAS")
     print("  " + "="*48)
 
-    # --- fila de atencion normal ---
+    # --- Cola de atencion normal ---
     print(f"\n  [FILA DE ATENCION ACTUAL]  ({len(fila_clientes)} personas)")
     print("  " + "-"*48)
     if len(fila_clientes) == 0:
@@ -118,11 +126,11 @@ def ver_fila():
     else:
         for i in range(len(fila_clientes)):
             c = fila_clientes[i]
-            # indico quien es el siguiente a ser atendido
+            # El primero de la lista es el siguiente a ser atendido
             etiqueta = "  <-- siguiente" if i == 0 else ""
             print(f"  {i+1}. [{c['id_cliente']}] {c['nombre']}{etiqueta}")
 
-    # --- fila de preventa ---
+    # --- Cola de preventa ---
     print(f"\n  [FILA DE PREVENTA]  ({len(fila_preventa)} registrados)")
     print(f"  Pelicula : {preventa_info['titulo']}")
     print(f"  Estreno  : {preventa_info['fecha_estreno']}  |  Precio aprox: ${preventa_info['precio_estimado']:.2f}")
@@ -136,9 +144,12 @@ def ver_fila():
     print("  " + "="*48)
 
 
-## Flujo de registro en preventa (solo registro, no compra todavia) ##
+## ============================================================ ##
+##              FLUJO DE REGISTRO EN PREVENTA                   ##
+## ============================================================ ##
 
 def flujo_preventa():
+    # Solo registra al cliente, no realiza compra todavia
     print("\n" + "="*52)
     print("   REGISTRO DE PREVENTA")
     print("="*52)
@@ -159,6 +170,7 @@ def flujo_preventa():
         print("  Necesitas dejar un contacto.")
         return
 
+    # Se encola al cliente en la fila de preventa
     registro = encolar_preventa(nombre, contacto)
     print(f"\n  Listo! Quedaste registrado.")
     print(f"  Tu numero en la fila de preventa es: #{registro['id_preventa']}")
@@ -166,54 +178,77 @@ def flujo_preventa():
     print(f"  Te contactaremos a: {contacto}")
 
 
-## Funciones para pila (historial de transacciones) ##
+## ============================================================ ##
+##                     FUNCIONES DE PILA                        ##
+## ============================================================ ##
 
 def apilar_transaccion(transaccion):
-    # el mas reciente queda hasta arriba
+    # PUSH: agrega la transaccion al tope de la pila (mas reciente arriba)
     historial_transacciones.append(transaccion)
 
+def desapilar_transaccion():
+    # POP: elimina y retorna la transaccion del tope de la pila (la mas reciente)
+    # Retorna None si la pila esta vacia
+    if len(historial_transacciones) == 0:
+        return None
+    return historial_transacciones.pop()
+
 def ver_historial():
-    print("\n  === HISTORIAL DE TRANSACCIONES ===")
+    # Muestra todas las transacciones del mas reciente (tope) al mas antiguo (base)
+    print("\n  === HISTORIAL DE TRANSACCIONES (PILA) ===")
     if len(historial_transacciones) == 0:
         print("  (sin transacciones todavia)")
         return
-    # muestro del mas reciente al mas antiguo
     for i in range(len(historial_transacciones) - 1, -1, -1):
         t = historial_transacciones[i]
         print(f"  Boleto #{t['id_boleto']} | {t['cliente']} | {t['pelicula']} | Asiento {t['asiento']} | ${t['total']:.2f}")
 
 
-## Funciones para ordenamiento y busqueda de boletos ##
+## ============================================================ ##
+##              ORDENAMIENTO (ALGORITMO BURBUJA)                ##
+## ============================================================ ##
 
 def ordenar_burbuja(lista):
-    # hago copia para no tocar la original
+    # Implementacion manual del algoritmo de burbuja
+    # Compara pares adyacentes y los intercambia si estan en orden incorrecto
+    # Complejidad: O(n^2)
+
+    # Se trabaja sobre una copia para no modificar la lista original
     copia = []
     for x in lista:
         copia.append(x)
 
     n = len(copia)
     for i in range(n):
+        # Cada pasada coloca el mayor elemento restante al final
         for j in range(0, n - i - 1):
             if copia[j]["id_boleto"] > copia[j+1]["id_boleto"]:
+                # Intercambio (swap) manual usando variable temporal
                 temp = copia[j]
                 copia[j] = copia[j+1]
                 copia[j+1] = temp
     return copia
 
 
-## busqueda secuencial por ID de boleto ##
+## ============================================================ ##
+##                   BUSQUEDA SECUENCIAL POR ID                 ##
+## ============================================================ ##
 
 def buscar_boleto(id_buscado):
-    # recorro uno por uno hasta encontrarlo o acabar
+    # Recorre la lista de boletos uno por uno hasta encontrar el ID
+    # Complejidad: O(n) — en el peor caso revisa todos los elementos
     for boleto in boletos_vendidos:
         if boleto["id_boleto"] == id_buscado:
-            return boleto
-    return None
+            return boleto  # Retorna el boleto si lo encuentra
+    return None  # Retorna None si no existe ese ID
 
 
-## Funciones para mostrar cartelera y mapa de asientos ##
+## ============================================================ ##
+##              CARTELERA Y MAPA DE ASIENTOS                    ##
+## ============================================================ ##
 
 def mostrar_cartelera():
+    # Muestra las peliculas disponibles con disponibilidad de asientos
     print("\n  +--------------------------------------------------+")
     print("  |           CARTELERA DE HOY                      |")
     print("  +--------------------------------------------------+")
@@ -224,12 +259,14 @@ def mostrar_cartelera():
         print("  +--------------------------------------------------+")
 
 def obtener_pelicula_por_id(id_peli):
+    # Busca y retorna una pelicula por su ID, o None si no existe
     for peli in cartelera:
         if peli["id"] == id_peli:
             return peli
     return None
 
 def asientos_libres(id_peli):
+    # Retorna una lista con los numeros de asiento disponibles para una pelicula
     ocupados = asientos_ocupados[id_peli]
     libres = []
     for num in range(1, 11):
@@ -238,6 +275,7 @@ def asientos_libres(id_peli):
     return libres
 
 def mostrar_mapa_asientos(id_peli):
+    # Imprime una representacion visual de los asientos de la sala
     ocupados = asientos_ocupados[id_peli]
     print("\n  Mapa de asientos  [N] = libre   X = ocupado")
     print("  +-----------+   +-----------+")
@@ -258,7 +296,9 @@ def mostrar_mapa_asientos(id_peli):
     print("         -- PANTALLA --\n")
 
 
-## Flujo completo de compra de boleto (desde que el cliente llega hasta que se emite el boleto) ##
+## ============================================================ ##
+##              FLUJO COMPLETO DE COMPRA DE BOLETO              ##
+## ============================================================ ##
 
 def flujo_compra():
     global id_boleto_actual
@@ -267,7 +307,7 @@ def flujo_compra():
     print("   BIENVENIDO A CINETOBI")
     print("="*52)
 
-    # paso 1: pedir nombre y agregar a la fila
+    # Paso 1: Pedir nombre y agregar al cliente a la cola
     nombre = input("\n  Como te llamas? ").strip()
     if nombre == "":
         nombre = "Cliente"
@@ -275,15 +315,13 @@ def flujo_compra():
     encolar_cliente(nombre, id_c)
     print(f"\n  Hola {nombre}! Te agregamos a la fila. Tu ID es: {id_c}")
     print(f"  Posicion en fila: #{len(fila_clientes)}")
-    time.sleep(1)
 
-    # paso 2: llamar al cliente (desencolar)
+    # Paso 2: Llamar al cliente (desencolar — FIFO)
     print("\n  Llamando al siguiente cliente...")
-    time.sleep(1)
     cliente_actual = desencolar_cliente()
     print(f"  Es tu turno, {cliente_actual['nombre']}!")
 
-    # paso 3: mostrar cartelera y elegir pelicula
+    # Paso 3: Mostrar cartelera y elegir pelicula
     mostrar_cartelera()
 
     pelicula_elegida = None
@@ -303,7 +341,7 @@ def flujo_compra():
 
     print(f"\n  Elegiste: {pelicula_elegida['titulo']} a las {pelicula_elegida['horario']}")
 
-    # paso 4: elegir asiento
+    # Paso 4: Mostrar mapa y elegir asiento
     mostrar_mapa_asientos(pelicula_elegida["id"])
     libres = asientos_libres(pelicula_elegida["id"])
 
@@ -318,7 +356,7 @@ def flujo_compra():
         except:
             print("  Escribe un numero de asiento.")
 
-    # paso 5: resumen y pago
+    # Paso 5: Resumen y confirmacion de pago
     precio = pelicula_elegida["precio"]
     print(f"\n  ------------------------------------")
     print(f"  RESUMEN DE COMPRA")
@@ -335,12 +373,8 @@ def flujo_compra():
         print("  Compra cancelada.")
         return
 
-    # simulacion de pago
-    print("\n  Procesando pago", end="")
-    for _ in range(4):
-        time.sleep(0.4)
-        print(".", end="", flush=True)
-    print()
+    # Paso 6: Simulacion de pago
+    print("\n  Procesando pago...")
 
     pago_valido = False
     while not pago_valido:
@@ -357,7 +391,7 @@ def flujo_compra():
     print(f"  Pago recibido: ${pago:.2f}")
     print(f"  Cambio: ${cambio:.2f}")
 
-    # paso 6: registrar el boleto
+    # Paso 7: Registrar el boleto y apilar la transaccion en la pila
     asientos_ocupados[pelicula_elegida["id"]].append(asiento_elegido)
 
     boleto = {
@@ -371,7 +405,7 @@ def flujo_compra():
         "total": precio
     }
     boletos_vendidos.append(boleto)
-    apilar_transaccion(boleto)
+    apilar_transaccion(boleto)  # Se apila en el historial (PUSH)
 
     print(f"\n  ====================================")
     print(f"  BOLETO #{id_boleto_actual} EMITIDO")
@@ -383,7 +417,9 @@ def flujo_compra():
     id_boleto_actual += 1
 
 
-## Menu de administracion para ver boletos vendidos, buscar por ID, ordenar, ver historial y estado de filas ##
+## ============================================================ ##
+##                   MENU DE ADMINISTRACION                     ##
+## ============================================================ ##
 
 def menu_admin():
     while True:
@@ -392,16 +428,18 @@ def menu_admin():
         print("="*52)
         print("  1. Ver todos los boletos vendidos")
         print("  2. Ver boletos por pelicula")
-        print("  3. Buscar boleto por ID")
+        print("  3. Buscar boleto por ID (busqueda secuencial)")
         print("  4. Ver boletos ordenados (algoritmo burbuja)")
         print("  5. Ver historial de transacciones (pila)")
-        print("  6. Ver estado de filas (atencion + preventa)")
-        print("  7. Cancelar registro de preventa")
+        print("  6. Deshacer ultima transaccion (desapilar)")
+        print("  7. Ver estado de filas (atencion + preventa)")
+        print("  8. Cancelar registro de preventa")
         print("  0. Volver al menu principal")
 
         opcion = input("\n  Opcion: ").strip()
 
         if opcion == "1":
+            # Muestra todos los boletos en el orden en que fueron vendidos
             print("\n  === TODOS LOS BOLETOS VENDIDOS ===")
             if len(boletos_vendidos) == 0:
                 print("  No se ha vendido ningun boleto aun.")
@@ -410,6 +448,7 @@ def menu_admin():
                     print(f"  #{b['id_boleto']} | {b['cliente']} | {b['pelicula']} | Asiento {b['asiento']} | ${b['total']:.2f}")
 
         elif opcion == "2":
+            # Filtra boletos por pelicula especifica
             mostrar_cartelera()
             try:
                 id_p = int(input("  Boletos de cual pelicula? (1, 2 o 3): "))
@@ -429,6 +468,7 @@ def menu_admin():
                 print("  Entrada no valida.")
 
         elif opcion == "3":
+            # Busqueda secuencial: recorre la lista hasta encontrar el ID
             try:
                 id_buscar = int(input("  ID del boleto a buscar: "))
                 resultado = buscar_boleto(id_buscar)
@@ -446,22 +486,35 @@ def menu_admin():
                 print("  Ingresa un numero valido.")
 
         elif opcion == "4":
+            # Ordena los boletos por ID usando burbuja (sin usar sort())
             if len(boletos_vendidos) == 0:
                 print("  No hay boletos para ordenar.")
             else:
                 ordenados = ordenar_burbuja(boletos_vendidos)
-                print("\n  Boletos ordenados por ID (burbuja):")
+                print("\n  Boletos ordenados por ID (algoritmo burbuja):")
                 for b in ordenados:
                     print(f"  #{b['id_boleto']} | {b['cliente']} | {b['pelicula']} | Asiento {b['asiento']}")
 
         elif opcion == "5":
+            # Muestra el historial desde el tope (mas reciente) hasta la base
             ver_historial()
 
         elif opcion == "6":
-            ver_fila()
+            # POP: desapila (elimina) la transaccion mas reciente de la pila
+            eliminada = desapilar_transaccion()
+            if eliminada is None:
+                print("  La pila de transacciones esta vacia.")
+            else:
+                print(f"\n  Transaccion desapilada (eliminada del historial):")
+                print(f"  Boleto #{eliminada['id_boleto']} | {eliminada['cliente']} | {eliminada['pelicula']} | Asiento {eliminada['asiento']}")
+                print(f"  Transacciones restantes en la pila: {len(historial_transacciones)}")
 
         elif opcion == "7":
-            # permite cancelar un registro de preventa buscando por id
+            # Muestra el estado de ambas colas
+            ver_fila()
+
+        elif opcion == "8":
+            # Permite cancelar un registro de preventa buscando por ID
             if len(fila_preventa) == 0:
                 print("  No hay nadie en la fila de preventa.")
             else:
@@ -483,7 +536,9 @@ def menu_admin():
             print("  Opcion no valida.")
 
 
-## Menu principal del sistema ##
+## ============================================================ ##
+##                      MENU PRINCIPAL                          ##
+## ============================================================ ##
 
 def menu_principal():
     while True:
@@ -510,5 +565,6 @@ def menu_principal():
             print("  Opcion no valida.")
 
 
+## Punto de entrada del programa ##
 if __name__ == "__main__":
     menu_principal()
