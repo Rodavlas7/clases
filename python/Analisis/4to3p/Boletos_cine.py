@@ -211,23 +211,21 @@ def ver_historial():
 def ordenar_burbuja(lista):
     # Implementacion manual del algoritmo de burbuja
     # Compara pares adyacentes y los intercambia si estan en orden incorrecto
-    # Complejidad: O(n^2)
 
-    # Se trabaja sobre una copia para no modificar la lista original
     copia = []
     for x in lista:
         copia.append(x)
 
     n = len(copia)
-    for i in range(n):
+    for i in range(n):  ##cuantas veces se va a repetir##
         # Cada pasada coloca el mayor elemento restante al final
-        for j in range(0, n - i - 1):
+        for j in range(0, n - i - 1):### va comparando ###
             if copia[j]["id_boleto"] > copia[j+1]["id_boleto"]:
                 # Intercambio (swap) manual usando variable temporal
                 temp = copia[j]
                 copia[j] = copia[j+1]
                 copia[j+1] = temp
-    return copia
+    return copia 
 
 
 ## ============================================================ ##
@@ -426,49 +424,26 @@ def menu_admin():
         print("\n" + "="*52)
         print("   PANEL DE ADMINISTRACION")
         print("="*52)
-        print("  1. Ver todos los boletos vendidos")
-        print("  2. Ver boletos por pelicula")
-        print("  3. Buscar boleto por ID (busqueda secuencial)")
-        print("  4. Ver boletos ordenados (algoritmo burbuja)")
-        print("  5. Ver historial de transacciones (pila)")
-        print("  6. Deshacer ultima transaccion (desapilar)")
-        print("  7. Ver estado de filas (atencion + preventa)")
-        print("  8. Cancelar registro de preventa")
+        print("  1. Ver boletos vendidos (ordenados por burbuja)")
+        print("  2. Buscar boleto por ID (busqueda secuencial)")
+        print("  3. Ver historial de transacciones (pila)")
+        print("  4. Deshacer ultima transaccion (desapilar)")
+        print("  5. Ver estado de filas (atencion + preventa)")
+        print("  6. Cancelar registro de preventa")
         print("  0. Volver al menu principal")
 
         opcion = input("\n  Opcion: ").strip()
 
         if opcion == "1":
-            # Muestra todos los boletos en el orden en que fueron vendidos
-            print("\n  === TODOS LOS BOLETOS VENDIDOS ===")
             if len(boletos_vendidos) == 0:
-                print("  No se ha vendido ningun boleto aun.")
+                print("  No hay boletos para ordenar.")
             else:
-                for b in boletos_vendidos:
+                ordenados = ordenar_burbuja(boletos_vendidos)
+                print("\n  Boletos ordenados por ID (algoritmo burbuja):")
+                for b in ordenados:
                     print(f"  #{b['id_boleto']} | {b['cliente']} | {b['pelicula']} | Asiento {b['asiento']} | ${b['total']:.2f}")
 
         elif opcion == "2":
-            # Filtra boletos por pelicula especifica
-            mostrar_cartelera()
-            try:
-                id_p = int(input("  Boletos de cual pelicula? (1, 2 o 3): "))
-                peli = obtener_pelicula_por_id(id_p)
-                if peli is None:
-                    print("  Pelicula no valida.")
-                else:
-                    print(f"\n  Boletos vendidos para '{peli['titulo']}':")
-                    encontrado = False
-                    for b in boletos_vendidos:
-                        if b["pelicula"] == peli["titulo"]:
-                            print(f"    #{b['id_boleto']} | {b['cliente']} | Asiento {b['asiento']}")
-                            encontrado = True
-                    if not encontrado:
-                        print("  Ninguno todavia.")
-            except:
-                print("  Entrada no valida.")
-
-        elif opcion == "3":
-            # Busqueda secuencial: recorre la lista hasta encontrar el ID
             try:
                 id_buscar = int(input("  ID del boleto a buscar: "))
                 resultado = buscar_boleto(id_buscar)
@@ -485,22 +460,10 @@ def menu_admin():
             except:
                 print("  Ingresa un numero valido.")
 
-        elif opcion == "4":
-            # Ordena los boletos por ID usando burbuja (sin usar sort())
-            if len(boletos_vendidos) == 0:
-                print("  No hay boletos para ordenar.")
-            else:
-                ordenados = ordenar_burbuja(boletos_vendidos)
-                print("\n  Boletos ordenados por ID (algoritmo burbuja):")
-                for b in ordenados:
-                    print(f"  #{b['id_boleto']} | {b['cliente']} | {b['pelicula']} | Asiento {b['asiento']}")
-
-        elif opcion == "5":
-            # Muestra el historial desde el tope (mas reciente) hasta la base
+        elif opcion == "3":
             ver_historial()
 
-        elif opcion == "6":
-            # POP: desapila (elimina) la transaccion mas reciente de la pila
+        elif opcion == "4":
             eliminada = desapilar_transaccion()
             if eliminada is None:
                 print("  La pila de transacciones esta vacia.")
@@ -509,12 +472,10 @@ def menu_admin():
                 print(f"  Boleto #{eliminada['id_boleto']} | {eliminada['cliente']} | {eliminada['pelicula']} | Asiento {eliminada['asiento']}")
                 print(f"  Transacciones restantes en la pila: {len(historial_transacciones)}")
 
-        elif opcion == "7":
-            # Muestra el estado de ambas colas
+        elif opcion == "5":
             ver_fila()
 
-        elif opcion == "8":
-            # Permite cancelar un registro de preventa buscando por ID
+        elif opcion == "6":
             if len(fila_preventa) == 0:
                 print("  No hay nadie en la fila de preventa.")
             else:
