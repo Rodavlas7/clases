@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block title %} 
+    DETAIL BANK VIEW 
+{% endblock %}
+
+{% block content %}
+    {{bank}}
+    <a href="{% url 'list_banks' %}">Back to list</a>
+{% endblock %}

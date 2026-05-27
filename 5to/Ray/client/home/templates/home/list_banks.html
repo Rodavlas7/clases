@@ -1,0 +1,28 @@
+{% extends "base/base.html" %}
+
+{% block title %}LIST BANK VIEW{% endblock %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>STATUS</th>
+                <th></th>
+                <th>ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for bank in banks %}
+            <tr>
+                <td>{{ bank.id }}</td>
+                <td>{{ bank.name }}</td>
+                <td>{{ bank.status }}</td>
+                <td><a href="{% url 'home:detail_bank' bank.id %}" class="btn btn-outline-info">Detail</a></td>
+                <td><a href="" class="btn btn-outline-warning">Update</a></td>
+                <td><a href="" class="btn btn-outline-danger">Delete</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+{% endblock %}
