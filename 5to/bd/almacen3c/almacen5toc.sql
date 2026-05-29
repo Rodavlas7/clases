@@ -4,12 +4,63 @@
 --      Nombre del cliente
 --      Nombre completo del contacto, en una columna
 
-select nombreFiscal,
-concat(contNombre,' ' ,contPrimerApell,' ' ,ifnull(contSegApell, '')) as Contacto
+create view v_cte_contacto as
+select nombreFiscal as cliente,
+concat(contNombre,' ' ,contPrimerApell,' ' ,ifnull(contSegApell, '')) as contacto
 from cliente;
+
+
+-- consultar todos los campos de la vista
+
+select cliente, contacto
+from v_cte_contacto;
+
+select contacto
+from v_cte_contacto
+where cliente = 'Baby Ley';
 
 -- 2. Mostrar el número de pedido, la fecha (con formato) y
 --    el total de todos los pedidos
+
+select num as Numero,
+DATE_FORMAT(fecha, '%d/%m/%Y') as Fecha,
+total
+from pedido;
+
+create view v_tolaXpedido as
+select num as Numero,
+fecha as Fecha,
+total as Total
+from pedido;
+
+-- consultas de la vista
+
+select numero, fecha, total
+from v_tolaXpedido;
+
+
+select 
+    DATE_FORMAT(fecha, "%d/%m/%Y") as Fecha,
+    numero,
+    total
+from v_tolaxpedido
+where MONTH(fecha) = 2 ;
+
+select 
+    DATE_FORMAT(fecha, "%d/%m/%Y") as Fecha,
+    numero,
+    total
+from v_tolaxpedido
+where total > 5000 ;
+
+select 
+    DATE_FORMAT(fecha, "%d/%m/%Y") as Fecha,
+    numero,
+    total
+from v_tolaxpedido
+where numero = 8 ;
+
+
 
 
 
@@ -17,6 +68,13 @@ from cliente;
 --      Nombre de la sucursal
 --      Monto de la meta
 
+SELECT 
+    s.nombre AS " Nombre la sucursal\",
+    m.montoMeta AS "Monto de la meta""
+FROM meta m
+JOIN sucursal s 
+    ON m.sucursal = s.codigo
+WHERE MONTH(m.fechaInicio) = 1;
 
 
 -- 4. Mostrar la lista de vendedores de la  sucursal con código DIMIR:
@@ -112,3 +170,11 @@ INNER JOIN ped_prod AS pp ON pp.pedido = p.num
 INNER JOIN producto AS prod ON prod.codigo = pp.producto
 INNER JOIN cliente AS cl ON cl.num = p.cliente
 WHERE p.num = 5;
+
+
+-- TODAS LAS COLUMNAS DE LAS VISTAS DEBEN TENER UN ALIAS (NOMBRE)
+-- EN UNA VISTA SE PUEDE COLOCAR TODO LO QUE SE PUEDE PONER EN UN SELECT
+-- NO PUEDE INCLUIR UN ORDER BY, COMPUTE BY, etc.
+
+
+
