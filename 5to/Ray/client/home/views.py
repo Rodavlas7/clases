@@ -90,7 +90,6 @@ class UpdateBankApiView(generic.View):
 
     def get(self, request, pk):
         self.response = requests.get(url=f"{self.url_get}{pk}").json()
-        print("--- LO QUE MANDÓ LA API: ---", self.response) # <-- AGREGA ESTO
         self.context = {
             "bank" : self.response
         }
@@ -100,11 +99,19 @@ class UpdateBankApiView(generic.View):
         self.payload = {
             "name" : request.POST.get("name"),
             "address" : request.POST.get("address"),
-            "status" : request.POST.get("status")
+            # 1. CORREGIDO: Convertimos el checkbox vacío en un False real para que la API no falle
+            "status" : True if request.POST.get("status") else False
         }
-        self.response = requests.put(url=self.url_put.replace("<int:pk>", str(pk)), json=self.payload).json()
+        
+        # 2. CORREGIDO: Tu url_put original no tenía "<int:pk>" escrito, así que el replace fallaba. 
+        # Armamos la URL limpia usando f-strings.
+        url_final = f"{self.url_put}{pk}"
+        
+        # 3. CORREGIDO: Le quitamos el ".json()" al final de esta línea.
+        self.response = requests.put(url=url_final, json=self.payload)
+        
         self.context = {
-            "response" : self.response
+            "response" : self.response.status_code # Guardamos el código de éxito (ej. 200) para evitar que truene
         }
         return redirect("home:list_banks")
     
