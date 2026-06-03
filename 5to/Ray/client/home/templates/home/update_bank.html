@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+    UPDATE BANK VIEW
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" class="form-control" value="{{ bank.name }}">
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address" class="form-control" value="{{ bank.address }}">
+        <label for="status">Status:</label>
+        <input type="checkbox" id="status" name="status" {% if bank.status %}checked{% endif %}>
+        <button type="submit" class="btn btn-outline-warning">Update Bank</button>
+        <a href="{% url 'home:list_banks' %}" class="btn btn-outline-info">Cancel</a>
+    </form>
+{% endblock %}

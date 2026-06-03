@@ -5,6 +5,9 @@ app_name = "home"
 
 urlpatterns = [
     path('',views.Index.as_view(),name='index'),
-    path('list/banks',views.ListBankApiView.as_view(),name='list_banks'),
-    path('banks/detail/<int:pk>/', views.DetailBankApiView.as_view(), name='detail_bank'),
+    path('bank/list/',views.ListBankApiView.as_view(),name='list_banks'),
+    path('bank/detail/<int:pk>/', views.DetailBankApiView.as_view(), name='detail_bank'),
+    path('bank/update/<int:pk>/', views.UpdateBankApiView.as_view(), name='update_bank'),
+    path('bank/delete/<int:pk>/', views.DeleteBankApiView.as_view(), name='delete_bank'),
+    path('bank/create/', views.CreateBankApiView.as_view(), name='create_bank'),
 ]

@@ -3,6 +3,7 @@
 {% block title %}LIST BANK VIEW{% endblock %}
 
 {% block content %}
+<a href="{% url 'home:create_bank' %}" class="btn btn-outline-success form-control">Create Bank</a>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -20,8 +21,8 @@
                 <td>{{ bank.name }}</td>
                 <td>{{ bank.status }}</td>
                 <td><a href="{% url 'home:detail_bank' bank.id %}" class="btn btn-outline-info">Detail</a></td>
-                <td><a href="" class="btn btn-outline-warning">Update</a></td>
-                <td><a href="" class="btn btn-outline-danger">Delete</a></td>
+                <td><a href="{% url 'home:update_bank' bank.id %}" class="btn btn-outline-warning">Update</a></td>
+                <td><a href="{% url 'home:delete_bank' bank.id %}" class="btn btn-outline-danger">Delete</a></td>
             </tr>
             {% endfor %}
         </tbody>

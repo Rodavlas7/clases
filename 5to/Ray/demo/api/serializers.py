@@ -41,13 +41,12 @@ class DetailBankSerializer(serializers.ModelSerializer):
         ]
 
 ## update serializer bank 
-# CAMBIADO: Nombre único para evitar sobrescribir el anterior
 class UpdateBankSerializer(serializers.ModelSerializer): 
     class Meta:
         model = models.Bank
         fields = [
             "name",
-            "address", # CORREGIDO: doble 'd'
+            "address",
             "status"
         ]
 

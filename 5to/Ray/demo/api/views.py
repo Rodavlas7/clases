@@ -24,9 +24,16 @@ class ListBankApiView(APIView):
 class DetailBankApiView(APIView):
     def get(self, request, pk):
         queryset = models.Bank.objects.get(id = pk)
-        data = serializers.ListBankSerializer(queryset, many=False).data
+        data = serializers.DetailBankSerializer(queryset, many=False).data
         return Response(data)
     
 class CreateBankApiView(generics.CreateAPIView):
     serializer_class = serializers.CreateBankSerializer
     
+class UpdateBankApiView(generics.UpdateAPIView):
+    queryset = models.Bank.objects.all()
+    serializer_class = serializers.UpdateBankSerializer
+
+class DeleteBankApiView(generics.DestroyAPIView):
+    queryset = models.Bank.objects.all()
+    serializer_class = serializers.DeleteBankSerializer
