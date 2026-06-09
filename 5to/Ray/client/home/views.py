@@ -6,17 +6,16 @@ from home import forms
 
 class Index(generic.View):
     template_name = "home/index.html"
-    url_base = "http://127.0.0.1:8001/api/v1/users/list" # Asegúrate del puerto
+    url_base = "http://127.0.0.1:8001/api/v1/users/list" 
 
     def get(self, request):
         try:
             res = requests.get(self.url_base)
-            # Si no es un 200 OK, esto saltará al except
             res.raise_for_status() 
             users_data = res.json()
         except Exception as e:
             print(f"--- ERROR EN API USUARIOS: {e} ---")
-            users_data = [] # Lista vacía para que el template no falle
+            users_data = [] 
 
         context = {
             "users": users_data

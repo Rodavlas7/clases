@@ -1,0 +1,46 @@
+{% extends "base/base.html" %}
+
+{% block title %}DETAIL TRUCK VIEW{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Truck Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">ID:</div>
+                <div class="col-sm-9">{{ truck.id }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Economic Number:</div>
+                <div class="col-sm-9">{{ truck.economic_number }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Plates:</div>
+                <div class="col-sm-9">{{ truck.plates }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Brand:</div>
+                <div class="col-sm-9">{{ truck.brand }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-3 fw-bold">Status:</div>
+                <div class="col-sm-9">
+                    {% if truck.is_active %}
+                        <span class="badge bg-success">In Route</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Available</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{% url 'home:list_trucks' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

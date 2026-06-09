@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block title %} 
+    DETAIL TRUCK VIEW 
+{% endblock %}
+
+{% block content %}
+    {{truck}}
+    <a href="{% url 'list_trucks' %}">Back to list</a>
+{% endblock %}

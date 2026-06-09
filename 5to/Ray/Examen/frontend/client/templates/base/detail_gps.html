@@ -1,0 +1,10 @@
+{% extends "base/base.html" %}
+
+{% block title %} 
+    DETAIL GPS VIEW 
+{% endblock %}
+
+{% block content %}
+    {{gps}}
+    <a href="{% url 'list_gps' %}">Back to list</a>
+{% endblock %}
