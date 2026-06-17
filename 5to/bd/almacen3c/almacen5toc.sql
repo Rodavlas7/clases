@@ -177,4 +177,228 @@ WHERE p.num = 5;
 -- NO PUEDE INCLUIR UN ORDER BY, COMPUTE BY, etc.
 
 
+-- agregar codigo sucursal, codigo de ciudad y numero de representante de ventas a
 
+drop view if exists v_clave;
+create view v_clave as
+SELECT 
+    p.num as Numero_Pedido,
+    p.fecha as Fecha,
+    s.codigo as Codigo_Sucursal,
+    s.nombre AS Sucursal,
+    c.codigo as Codigo_Ciudad,
+    c.nombre AS Ciudad,
+    cl.num as Numero_Cliente,
+    cl.nombreFiscal AS Cliente,
+    rv.num as Numero_Representante_Ventas,
+    CONCAT(rv.nombre, ' ', rv.primerApell, ' ', IFNULL(rv.segApell, '')) AS Representante_Ventas,
+    prod.codigo AS Codigo_Producto,
+    prod.nombre AS Producto,
+    prod.precio AS Precio_Unitario,
+    pp.importe AS Importe,
+    pp.cantidad AS Cantidad,
+    p.subtotal AS SubTotal,
+    p.total AS Total,
+    p.totalConInt AS Total_con_Intereses,
+    p.IVA as IVA,
+    p.cantTotalProd as Cantidad_Productos
+FROM pedido AS p
+INNER JOIN sucursal AS s ON p.sucursal = s.codigo
+INNER JOIN ciudad AS c ON s.ciudad = c.codigo
+INNER JOIN rep_vtas AS rv ON p.rep_vtas = rv.num
+INNER JOIN ped_prod AS pp ON pp.pedido = p.num
+INNER JOIN producto AS prod ON prod.codigo = pp.producto
+INNER JOIN cliente AS cl ON cl.num = p.cliente;
+
+-- realizar 10 consultas de la vista
+
+-- 1. Mostrar todos los datos de un pedido específico
+SELECT Numero_Pedido, 
+    date_format(Fecha, '%d/%m/%Y') as Fecha,
+    Sucursal, 
+    Ciudad, 
+    Cliente, 
+    Representante_Ventas, 
+    Producto, 
+    Precio_Unitario, 
+    Importe, 
+    SubTotal, 
+    IVA, 
+    Total, 
+    Cantidad_Productos
+FROM v_clave
+WHERE Numero_Pedido = 5;
+
+-- 2. Listar los pedidos realizados en un rango de fechas
+SELECT Numero_Pedido, 
+    date_format(Fecha, '%d/%m/%Y') as Fecha,
+    Sucursal, 
+    Ciudad, 
+    Cliente,
+    Representante_Ventas, 
+    Producto, 
+    Precio_Unitario, 
+    Importe, 
+    SubTotal, 
+    IVA, 
+    Total, 
+    Cantidad_Productos
+FROM v_clave
+WHERE Fecha BETWEEN '2025-01-01' AND '2025-02-28'
+ORDER BY Fecha;
+
+--3. Mostrar todos los pedidos de un representante de ventas específico
+SELECT Numero_Pedido, 
+    date_format(Fecha, '%d/%m/%Y') as Fecha,
+    Sucursal, 
+    Ciudad, 
+    Cliente, 
+    Numero_Representante_Ventas,
+    Representante_Ventas,
+    Producto, 
+    Precio_Unitario, 
+    Total, 
+    Cantidad_Productos
+FROM v_clave
+WHERE Numero_Representante_Ventas = 7;
+
+--4. Mostrar todos los pedidos de un cliente
+SELECT Numero_Pedido, 
+    date_format(Fecha, '%d/%m/%Y') as Fecha,
+    Sucursal, 
+    Cliente, 
+    Representante_Ventas,
+    Producto, 
+    Precio_Unitario, 
+    Importe, 
+    SubTotal, 
+    IVA, 
+    Total, 
+    Cantidad_Productos
+FROM v_clave
+WHERE Cliente = 'El almendro';
+
+--5. Mostrar el total de ventas por sucursal
+SELECT Sucursal,    
+    SUM(Total) AS Total_Ventas
+FROM v_clave
+GROUP BY Sucursal
+ORDER BY Total_Ventas DESC;
+
+-- 6. mostrar el numero de pedidos por cliente
+SELECT Cliente, 
+    COUNT(Numero_Pedido) AS Numero_Pedidos
+FROM v_clave
+GROUP BY Cliente
+ORDER BY Numero_Pedidos DESC;
+
+-- 7. Mostrar el total de ventas por representante de ventas
+SELECT Representante_Ventas,    
+    SUM(Total) AS Total_Ventas
+FROM v_clave
+GROUP BY Representante_Ventas
+ORDER BY Total_Ventas DESC;
+
+-- 8. Mostrar el total de ventas por ciudad
+select Ciudad,    
+    SUM(Total) AS Total_Ventas
+FROM v_clave
+GROUP BY Ciudad
+ORDER BY Total_Ventas DESC;
+
+-- 9. Mostrar el total de ventas por producto por ciudad
+SELECT Producto, Ciudad,    
+    SUM(cantidad) AS cantidad_vendida,
+    Precio_Unitario
+FROM v_clave
+GROUP BY Producto, Ciudad
+ORDER BY cantidad_vendida DESC;
+
+-- 10. Mostrar el total de ventas por mes de una sucursal específica
+SELECT 
+    MONTH(Fecha) AS Mes,
+    Sucursal,
+    SUM(Total) AS Total_Ventas
+FROM v_clave
+WHERE Codigo_Sucursal = 'BAHIA'
+GROUP BY Mes
+ORDER BY Mes;
+
+
+--Subconsutas
+-- 1. Datos de los pedidos comprados por el mismo cliente, haciendo la busqueda por el nombre del cliente
+-- Numero del pedido
+-- Decha del pedido
+-- Nombre de la sucursal
+-- Nombre de la ciudad
+-- Monto total de la compra
+
+SELECT 
+    p.num AS Numero_Pedido,
+    DATE_FORMAT(p.fecha, '%d/%m/%Y') AS Fecha_Pedido,
+    s.nombre AS Nombre_Sucursal,
+    c.nombre AS Nombre_Ciudad,
+    p.total AS Monto_Total
+FROM pedido AS p
+INNER JOIN sucursal AS s ON p.sucursal = s.codigo
+INNER JOIN ciudad AS c ON s.ciudad = c.codigo
+WHERE p.cliente IN (
+    SELECT num 
+    FROM cliente 
+    WHERE nombreFiscal = 'El almendro'
+);
+
+-- 2. Sucursales de la ciudad de TIjuana
+-- Nombre de la sucursal
+-- Direccion en una columna
+
+SELECT 
+    s.nombre AS Nombre_Sucursal,
+    CONCAT( s.dirCalle, ' #', s.dirNum, ', Col. ',  s.dirColonia) AS Direccion
+FROM sucursal AS s
+WHERE s.ciudad = (
+    SELECT codigo 
+    FROM ciudad 
+    WHERE nombre = 'Tijuana'
+);
+
+-- 3. vendedores que tienen ventas menores al promedio
+-- Nombre del vendedor
+-- Monto de ventas
+
+SELECT
+    CONCAT(rv.nombre,' ', IFNULL(rv.`primerApell` , ''), ' ', rv.`segApell`)
+FROM rep_vtas as rv
+WHERE rv.num IN (
+    SELECT AVG()
+    )
+
+-- 3. Vendedores que tienen ventas menores al promedio
+-- Nombre del vendedor
+-- Monto de ventas
+
+SELECT 
+    CONCAT(rv.nombre, ' ', rv.primerApell, ' ', IFNULL(rv.segApell, '')) AS Nombre_Vendedor,
+    m.montoVentas AS Monto_Ventas
+FROM rep_vtas AS rv
+INNER JOIN meta AS m ON rv.num = m.repVtas
+WHERE m.montoVentas < (
+    SELECT AVG(montoVentas) 
+    FROM meta
+);
+
+
+-- 4. Representantes de ventas de la ciudad de Mexicali
+-- Nombre de la sucursal
+-- Nombre del representante de ventas
+
+SELECT 
+    s.nombre AS Nombre_Sucursal,
+    CONCAT(rv.nombre, ' ', rv.primerApell, ' ', IFNULL(rv.segApell, '')) AS Nombre_Representante
+FROM rep_vtas AS rv
+INNER JOIN sucursal AS s ON rv.sucursal = s.codigo
+WHERE s.ciudad = (
+    SELECT codigo 
+    FROM ciudad 
+    WHERE nombre = 'Mexicali'
+);
