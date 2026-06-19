@@ -1,42 +1,57 @@
+from api import models
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
-from api import models
 from api import serializers
 
+from django.contrib.auth.models import User
 
-# VISTAS PARA DISPOSITIVOS GPS
+# Create your views here.
 
-class ListGpsApiView(APIView):
+class UserListApiVIew(APIView):
     def get(self, request):
-        queryset = models.GpsDevice.objects.all()
-        data = serializers.ListGpsSerializer(queryset, many=True).data
+        queryset = User.objects.all()
+        data = serializers.UserSerializer(queryset, many = True).data
         return Response(data)
     
-class DetailGpsApiView(APIView):
-    def get(self, request, pk):
-        queryset = models.GpsDevice.objects.get(id=pk)
-        data = serializers.DetailGpsSerializer(queryset, many=False).data
-        return Response(data)
-    
-class CreateGpsApiView(generics.CreateAPIView):
-    serializer_class = serializers.CreateGpsSerializer
-
-
-# VISTAS PARA CAMIONES (TRUCKS)
-
-class ListTruckApiView(APIView):
+class ListBankApiView(APIView):
     def get(self, request):
-        queryset = models.Truck.objects.all()
-        data = serializers.ListTruckSerializer(queryset, many=True).data
+        queryset = models.Bank.objects.all()
+        data = serializers.ListBankSerializer(queryset, many = True).data
         return Response(data)
     
-class DetailTruckApiView(APIView):
+class DetailBankApiView(APIView):
     def get(self, request, pk):
-        queryset = models.Truck.objects.get(id=pk)
-        data = serializers.DetailTruckSerializer(queryset, many=False).data
+        queryset = models.Bank.objects.get(id = pk)
+        data = serializers.DetailBankSerializer(queryset, many=False).data
         return Response(data)
     
-class CreateTruckApiView(generics.CreateAPIView):
-    serializer_class = serializers.CreateTruckSerializer
+class CreateBankApiView(generics.CreateAPIView):
+    serializer_class = serializers.CreateBankSerializer
+    
+class UpdateBankApiView(generics.UpdateAPIView):
+    queryset = models.Bank.objects.all()
+    serializer_class = serializers.UpdateBankSerializer
+
+class DeleteBankApiView(generics.DestroyAPIView):
+    queryset = models.Bank.objects.all()
+    serializer_class = serializers.DeleteBankSerializer
+
+class ListAccountApiView(generics.ListAPIView):
+    queryset = models.Account.objects.all()
+    serializer_class = serializers.ListAccountSerializer
+
+class DetailAccountApiView(generics.RetrieveAPIView):
+    queryset = models.Account.objects.all()
+    serializer_class = serializers.DetailAccountSerializer
+
+## account vieww
+
+class ListPaymentApiView(generics.ListAPIView):
+    queryset = models.Payment.objects.all()
+    serializer_class = serializers.PaymentSerializer
+
+class DetailPaymentApiView(generics.RetrieveAPIView):
+    queryset = models.Payment.objects.all()
+    serializer_class = serializers.DetailPaymentSerializer

@@ -18,3 +18,11 @@ class AccountAdmin(admin.ModelAdmin):
         "bank",
         "status"
     ]
+
+@admin.register(models.Payment)
+class PaymentAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "created_by",
+        "created_at"
+    ]

@@ -13,7 +13,6 @@ class Bank(models.Model):
     def __str__(self):
         return self.name
     
-
 CHOICES = (
     ('Dolar Americano','USD'),
     ('Peso Mexicano','MXN'),
@@ -27,6 +26,15 @@ class Account(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
     updated = models.DateTimeField(auto_now_add=False, auto_now=True)
     status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+class Payment(models.Model):
+    name = models.CharField(verbose_name='Nombre del pago',max_length=50)
+    accounts = models.ManyToManyField(Account, verbose_name='Cuentas', related_name='payments')
+    created_by = models.ForeignKey(User, related_name='payments', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
 
     def __str__(self):
         return self.name

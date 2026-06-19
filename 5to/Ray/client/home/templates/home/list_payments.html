@@ -1,0 +1,52 @@
+{% extends "base/base.html" %}
+
+{% block title %}LIST Payments VIEW{% endblock %}
+
+{% block content %}
+<a href="#" class="btn btn-outline-success form-control">Create Payment</a>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>ID ACCOUNTS</th>
+                <th>ACCOUNTS NAME</th>
+                <th>BANK NAME</th>
+                <th>ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in payments %}
+            <tr>
+                <td>{{ p.id }}</td>
+                
+                <td>{{ p.name }}</td>
+                
+                <td>
+                    {% for an in p.accounts_detail %}
+                        {{ an.id }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                
+                <td>
+                    {% for an in p.accounts_detail %}
+                        {{ an.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                
+                <td>
+                    {% for an in p.accounts_detail %}
+                        {{ an.bank.name }} {% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+
+                <td>
+                    <a href="{% url 'home:detail_payment' p.id %}" class="btn btn-outline-info">Detail</a>
+                    <a href="#" class="btn btn-outline-warning">Update</a>
+                    <a href="#" class="btn btn-outline-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

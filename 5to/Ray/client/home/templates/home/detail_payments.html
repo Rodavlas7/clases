@@ -1,0 +1,23 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+    Detalle del Banco
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Detalle del Banco</h2>
+    
+    <div class="card">
+        <div class="card-body">
+            <p><strong>ID:</strong> {{ bank.id }}</p>
+            <p><strong>Nombre:</strong> {{ bank.name }}</p>
+            <p><strong>Dirección:</strong> {{ bank.address }}</p>
+            <p><strong>Estatus:</strong> {{ bank.status }}</p>
+            
+            <br>
+            <a href="{% url 'home:list_banks' %}" class="btn btn-secondary">Volver a la lista</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
