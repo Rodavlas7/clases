@@ -137,3 +137,200 @@ class DeleteBankApiView(generic.View):
         
         # 3. Redirigimos a la lista de bancos
         return redirect("home:list_banks")
+    
+class ListPaymentApiView(generic.View):
+    template_name = 'home/list_payments.html'
+    context = {}
+    url_base = "http://127.0.0.1:8001/api/v2/payment/list/"
+    response = {}
+
+    def get(self, request):
+        self.response = requests.get(url=self.url_base).json()
+        self.context = {
+            "payments": self.response
+        }
+        return render(request, self.template_name, self.context)
+    
+class DetailPaymentApiView(generic.View):
+    template_name = 'home/detail_payment.html'
+    context = {}
+    url_base = "http://127.0.0.1:8001/api/v2/payment/detail/"
+
+    def get(self, request, pk):
+        self.response = requests.get(url=f"{self.url_base}{pk}").json()
+        self.context = {
+            "payment": self.response
+        }
+        return render(request, self.template_name, self.context)
+
+# Models.py del api
+"""
+from django.db import models
+from django.contrib.auth.models import User
+
+# Create your models here.
+
+class Bank(models.Model):
+    name = models.CharField(default='Generic Bank Name',max_length=32)
+    address = models.CharField(default='Generic Bank Address',max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+CHOICES = (
+    ('Dolar Americano','USD'),
+    ('Peso Mexicano','MXN'),
+    ('EURO','EUR'),
+)
+class Account(models.Model):
+    name = models.CharField(default='Generic Account Name',max_length=32)
+    bank = models.ForeignKey(Bank, on_delete=models.CASCADE)
+    currency = models.CharField(default='USD',max_length=16, choices=CHOICES)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True, auto_now=False)
+    updated = models.DateTimeField(auto_now_add=False, auto_now=True)
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+    
+class Payment(models.Model):
+    name = models.CharField(verbose_name='Nombre del pago',max_length=50)
+    accounts = models.ManyToManyField(Account, verbose_name='Cuentas', related_name='payments')
+    created_by = models.ForeignKey(User, related_name='payments', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True, auto_now=False)
+
+    def __str__(self):
+        return self.name
+"""
+
+
+#serializaers.py del api
+"""
+from rest_framework import serializers
+from django.contrib.auth.models import User
+from api import models
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "username", "first_name", "last_name"]
+
+## Banks serializers
+
+## Create serializer bank
+class CreateBankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Bank
+        fields = [
+            "name",
+            "address",
+        ]
+
+## list and detail serializer bank
+class ListBankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Bank
+        fields = [
+            "id",
+            "name",
+            "status"
+        ]
+
+class DetailBankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Bank
+        fields = [
+            "id",
+            "name",
+            "address",
+            "timestamp",
+            "updated",
+            "status",
+        ]
+
+## update serializer bank 
+class UpdateBankSerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = models.Bank
+        fields = [
+            "name",
+            "address",
+            "status"
+        ]
+
+## delete serializer
+class DeleteBankSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Bank
+        fields = [
+            "id",
+        ]
+
+## Accounts serializers
+
+## List
+class ListAccountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Account
+        fields = [
+            "id",
+            "name",
+            "bank",
+            "status"
+        ]
+
+class DetailAccountSerializer(serializers.ModelSerializer):
+    bank = DetailBankSerializer()
+    user = UserSerializer()
+
+    class Meta:
+        model = models.Account
+        fields = "__all__"
+
+##payment serializers
+
+class PaymentSerializer(serializers.ModelSerializer):
+    accounts_detail = DetailAccountSerializer(source='accounts', many=True, read_only=True)
+    user_name = serializers.CharField(source='created_by.username', read_only=True)
+
+    class Meta:
+        model = models.Payment
+        fields = [
+            "id",
+            "name",
+            "accounts",
+            "accounts_detail",
+            "created_by",
+            "user_name",
+            "created_at"
+        ]
+
+class ListPaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Payment
+        fields = [
+            "id",
+            "name",
+            "created_by",
+            "created_at"
+        ]
+
+class DetailPaymentSerializer(serializers.ModelSerializer):
+    accounts_detail = DetailAccountSerializer(source='accounts', many=True, read_only=True)
+    user_name = serializers.CharField(source='created_by.username', read_only=True)
+    class Meta:
+        model = models.Payment
+        fields = [
+            "id",
+            "name",
+            "accounts",
+            "accounts_detail",
+            "created_by",
+            "user_name",
+            "created_at"
+        ]
+"""

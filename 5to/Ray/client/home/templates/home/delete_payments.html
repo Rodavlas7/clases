@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+    Eliminar Banco
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-danger">
+        <h4>¿Estás seguro de que deseas eliminar el banco "{{ bank.name }}"?</h4>
+        <p>Esta acción no se puede deshacer.</p>
+    </div>
+
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+        <a href="{% url 'home:list_banks' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
