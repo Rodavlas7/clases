@@ -367,11 +367,21 @@ WHERE s.ciudad = (
 -- Monto de ventas
 
 SELECT
-    CONCAT(rv.nombre,' ', IFNULL(rv.`primerApell` , ''), ' ', rv.`segApell`)
-FROM rep_vtas as rv
-WHERE rv.num IN (
-    SELECT AVG()
-    )
+    s.nombre AS Nombre_Sucursal,
+    CONCAT(
+        s.dirCalle,
+        ' #', s.dirNum,
+        ', Col. ',
+        s.dirColonia
+    ) AS Direccion
+FROM sucursal AS s
+WHERE s.ciudad = (
+    SELECT codigo
+    FROM ciudad
+    WHERE nombre = 'Tijuana'
+);
+
+
 
 -- 3. Vendedores que tienen ventas menores al promedio
 -- Nombre del vendedor
@@ -401,4 +411,63 @@ WHERE s.ciudad = (
     SELECT codigo 
     FROM ciudad 
     WHERE nombre = 'Mexicali'
+);
+
+-- 5. Clientes que NO han realizado pedidos
+-- Nombre del cliente
+-- Límite de crédito
+
+SELECT
+    nombreFiscal AS Nombre_Cliente,
+    limCredito AS Limite_Credito
+FROM cliente
+WHERE num NOT IN (
+    SELECT cliente
+    FROM pedido
+);
+
+-- 6. Productos que NO han sido vendidos
+-- Código
+-- Nombre
+-- Descripción
+-- Precio de venta
+
+SELECT
+    codigo AS Codigo,
+    nombre AS Nombre,
+    descripcion AS Descripcion,
+    precio AS Precio_Venta
+FROM producto
+WHERE codigo NOT IN (
+    SELECT producto
+    FROM ped_prod
+);
+
+-- 7. Datos de las sucursales que han tenido pedidos
+-- Nombre de la sucursal
+-- Ciudad donde se encuentra
+-- Director de la sucursal
+
+SELECT
+    s.nombre AS Nombre_Sucursal,
+    c.nombre AS Ciudad,
+    CONCAT(
+        rv.nombre, ' ',
+        rv.primerApell, ' ',
+        IFNULL(rv.segApell, '')
+    ) AS Director_Sucursal
+FROM sucursal AS s
+INNER JOIN ciudad AS c
+    ON s.ciudad = c.codigo
+INNER JOIN rep_vtas AS rv
+    ON rv.num = (
+        SELECT DISTINCT director
+        FROM rep_vtas
+        WHERE sucursal = s.codigo
+          AND director IS NOT NULL
+        LIMIT 1
+    )
+WHERE s.codigo IN (
+    SELECT sucursal
+    FROM pedido
 );
