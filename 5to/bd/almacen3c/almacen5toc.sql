@@ -471,3 +471,65 @@ WHERE s.codigo IN (
     SELECT sucursal
     FROM pedido
 );
+
+delimiter $$
+create or REPLACE TRIGGER tg_verificar_fecha_pago
+before insert on pago
+for each row
+begin
+    if new.fecha > curdate() or new.fecha = curdate() then
+        signal sqlstate '45000' set message_text = 'La fecha de pago no puede ser posterior a la fecha actual';
+    end if;
+end $$
+DELIMITER;
+
+/*
+    2. inicializar los campos calculados
+*/
+
+DELIMITER $$
+
+CREATE or REPLACE trigger tg_inicializar_pedido
+BEFORE INSERT on pedido
+for each ROW
+begin
+    set new.fecha = CURRENT_TIMESTAMP;
+    set new.subtotal = 0;
+    set new.IVA = 0;
+    set new.total = 0;
+    set new.cantTotalProd = 0;
+    set new.totalConInt = 0;
+    set new.estado = "enpr";
+end $$
+
+DELIMITER;
+
+SELECT * FROM edo_pedido;
+SELECT * FROM pedido;
+
+# Prueba
+INSERT into pedido(sucursal, rep_vtas, cliente)
+VALUES("QUICA",3,7);
+/*
+    Trigger para la tabla ped_prod
+
+    Calcular el importe de cada producto en un pedido
+        ANTES de realizar el registro del producto:
+        --Verificar que el producto no existe en la sucursal
+          enviar mensaje de error.
+            -- Si el prodictp mp exoste en la sucursal,
+               enviar mensaje de error
+    -- si el producto existe en la sucursal, verificar que haya stock suficiente
+    -- si no hay stock suficiennte, no se realizar el registro y enviar el mensaje correspondiente
+    -- si hay stock suficiente, calcular el importe
+*/
+DELIMITER $$
+
+create or REPLACE trigger tg_verificar_existencias_producto
+before insert on ped_prod
+for EACH ROW
+begin
+    
+end$$
+
+DELIMITER;
