@@ -525,11 +525,53 @@ VALUES("QUICA",3,7);
 */
 DELIMITER $$
 
-create or REPLACE trigger tg_verificar_existencias_producto
-before insert on ped_prod
-for EACH ROW
-begin
-    
-end$$
+CREATE OR REPLACE TRIGGER tg_verificar_existencias_producto
+BEFORE INSERT ON ped_prod
+FOR EACH ROW
+BEGIN
+    DECLARE vSucursal VARCHAR(5);
+    DECLARE vStock INT;
+    DECLARE vPrecio FLOAT;
 
-DELIMITER;
+    -- Obtener la sucursal del pedido
+    SELECT sucursal
+    INTO vSucursal
+    FROM pedido
+    WHERE num = NEW.pedido;
+
+    -- Verificar que el producto exista en el almacén de la sucursal
+    IF NOT EXISTS(
+        SELECT 1
+        FROM almacen
+        WHERE sucursal = vSucursal
+          AND productos = NEW.producto
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El producto no existe en la sucursal del pedido';
+    END IF;
+
+    -- Obtener existencias
+    SELECT stock
+    INTO vStock
+    FROM almacen
+    WHERE sucursal = vSucursal
+      AND productos = NEW.producto;
+
+    -- Verificar stock suficiente
+    IF vStock < NEW.cantidad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No hay existencias suficientes del producto';
+    END IF;
+
+    -- Obtener precio del producto
+    SELECT precio
+    INTO vPrecio
+    FROM producto
+    WHERE codigo = NEW.producto;
+
+    -- Calcular importe
+    SET NEW.importe = NEW.cantidad * vPrecio;
+
+END$$
+
+DELIMITER ;
