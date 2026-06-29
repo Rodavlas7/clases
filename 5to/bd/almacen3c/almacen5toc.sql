@@ -529,25 +529,26 @@ CREATE OR REPLACE TRIGGER tg_verificar_existencias_producto
 BEFORE INSERT ON ped_prod
 FOR EACH ROW
 BEGIN
+
     DECLARE vSucursal VARCHAR(5);
     DECLARE vStock INT;
     DECLARE vPrecio FLOAT;
 
-    -- Obtener la sucursal del pedido
+    -- Obtener la sucursal
     SELECT sucursal
     INTO vSucursal
     FROM pedido
     WHERE num = NEW.pedido;
 
-    -- Verificar que el producto exista en el almacén de la sucursal
+    -- Verificar que el producto exista
     IF NOT EXISTS(
-        SELECT 1
+        SELECT *
         FROM almacen
         WHERE sucursal = vSucursal
           AND productos = NEW.producto
     ) THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'El producto no existe en la sucursal del pedido';
+        SET MESSAGE_TEXT = 'El producto no existe en la sucursal';
     END IF;
 
     -- Obtener existencias
@@ -557,13 +558,13 @@ BEGIN
     WHERE sucursal = vSucursal
       AND productos = NEW.producto;
 
-    -- Verificar stock suficiente
+    -- Verificar stock
     IF vStock < NEW.cantidad THEN
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No hay existencias suficientes del producto';
+        SET MESSAGE_TEXT = 'No hay existencias suficientes del producto para el pedido';
     END IF;
 
-    -- Obtener precio del producto
+    -- Obtener precio
     SELECT precio
     INTO vPrecio
     FROM producto
@@ -575,3 +576,5 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+select * from ;
