@@ -367,11 +367,21 @@ WHERE s.ciudad = (
 -- Monto de ventas
 
 SELECT
-    CONCAT(rv.nombre,' ', IFNULL(rv.`primerApell` , ''), ' ', rv.`segApell`)
-FROM rep_vtas as rv
-WHERE rv.num IN (
-    SELECT AVG()
-    )
+    s.nombre AS Nombre_Sucursal,
+    CONCAT(
+        s.dirCalle,
+        ' #', s.dirNum,
+        ', Col. ',
+        s.dirColonia
+    ) AS Direccion
+FROM sucursal AS s
+WHERE s.ciudad = (
+    SELECT codigo
+    FROM ciudad
+    WHERE nombre = 'Tijuana'
+);
+
+
 
 -- 3. Vendedores que tienen ventas menores al promedio
 -- Nombre del vendedor
@@ -402,3 +412,169 @@ WHERE s.ciudad = (
     FROM ciudad 
     WHERE nombre = 'Mexicali'
 );
+
+-- 5. Clientes que NO han realizado pedidos
+-- Nombre del cliente
+-- Límite de crédito
+
+SELECT
+    nombreFiscal AS Nombre_Cliente,
+    limCredito AS Limite_Credito
+FROM cliente
+WHERE num NOT IN (
+    SELECT cliente
+    FROM pedido
+);
+
+-- 6. Productos que NO han sido vendidos
+-- Código
+-- Nombre
+-- Descripción
+-- Precio de venta
+
+SELECT
+    codigo AS Codigo,
+    nombre AS Nombre,
+    descripcion AS Descripcion,
+    precio AS Precio_Venta
+FROM producto
+WHERE codigo NOT IN (
+    SELECT producto
+    FROM ped_prod
+);
+
+-- 7. Datos de las sucursales que han tenido pedidos
+-- Nombre de la sucursal
+-- Ciudad donde se encuentra
+-- Director de la sucursal
+
+SELECT
+    s.nombre AS Nombre_Sucursal,
+    c.nombre AS Ciudad,
+    CONCAT(
+        rv.nombre, ' ',
+        rv.primerApell, ' ',
+        IFNULL(rv.segApell, '')
+    ) AS Director_Sucursal
+FROM sucursal AS s
+INNER JOIN ciudad AS c
+    ON s.ciudad = c.codigo
+INNER JOIN rep_vtas AS rv
+    ON rv.num = (
+        SELECT DISTINCT director
+        FROM rep_vtas
+        WHERE sucursal = s.codigo
+          AND director IS NOT NULL
+        LIMIT 1
+    )
+WHERE s.codigo IN (
+    SELECT sucursal
+    FROM pedido
+);
+
+delimiter $$
+create or REPLACE TRIGGER tg_verificar_fecha_pago
+before insert on pago
+for each row
+begin
+    if new.fecha > curdate() or new.fecha = curdate() then
+        signal sqlstate '45000' set message_text = 'La fecha de pago no puede ser posterior a la fecha actual';
+    end if;
+end $$
+DELIMITER;
+
+/*
+    2. inicializar los campos calculados
+*/
+
+DELIMITER $$
+
+CREATE or REPLACE trigger tg_inicializar_pedido
+BEFORE INSERT on pedido
+for each ROW
+begin
+    set new.fecha = CURRENT_TIMESTAMP;
+    set new.subtotal = 0;
+    set new.IVA = 0;
+    set new.total = 0;
+    set new.cantTotalProd = 0;
+    set new.totalConInt = 0;
+    set new.estado = "enpr";
+end $$
+
+DELIMITER;
+
+SELECT * FROM edo_pedido;
+SELECT * FROM pedido;
+
+# Prueba
+INSERT into pedido(sucursal, rep_vtas, cliente)
+VALUES("QUICA",3,7);
+/*
+    Trigger para la tabla ped_prod
+
+    Calcular el importe de cada producto en un pedido
+        ANTES de realizar el registro del producto:
+        --Verificar que el producto no existe en la sucursal
+          enviar mensaje de error.
+            -- Si el prodictp mp exoste en la sucursal,
+               enviar mensaje de error
+    -- si el producto existe en la sucursal, verificar que haya stock suficiente
+    -- si no hay stock suficiennte, no se realizar el registro y enviar el mensaje correspondiente
+    -- si hay stock suficiente, calcular el importe
+*/
+DELIMITER $$
+
+CREATE OR REPLACE TRIGGER tg_verificar_existencias_producto
+BEFORE INSERT ON ped_prod
+FOR EACH ROW
+BEGIN
+
+    DECLARE vSucursal VARCHAR(5);
+    DECLARE vStock INT;
+    DECLARE vPrecio FLOAT;
+
+    -- Obtener la sucursal
+    SELECT sucursal
+    INTO vSucursal
+    FROM pedido
+    WHERE num = NEW.pedido;
+
+    -- Verificar que el producto exista
+    IF NOT EXISTS(
+        SELECT *
+        FROM almacen
+        WHERE sucursal = vSucursal
+          AND productos = NEW.producto
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El producto no existe en la sucursal';
+    END IF;
+
+    -- Obtener existencias
+    SELECT stock
+    INTO vStock
+    FROM almacen
+    WHERE sucursal = vSucursal
+      AND productos = NEW.producto;
+
+    -- Verificar stock
+    IF vStock < NEW.cantidad THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No hay existencias suficientes del producto para el pedido';
+    END IF;
+
+    -- Obtener precio
+    SELECT precio
+    INTO vPrecio
+    FROM producto
+    WHERE codigo = NEW.producto;
+
+    -- Calcular importe
+    SET NEW.importe = NEW.cantidad * vPrecio;
+
+END$$
+
+DELIMITER ;
+
+select * from ;
