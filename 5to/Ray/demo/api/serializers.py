@@ -121,3 +121,12 @@ class DetailPaymentSerializer(serializers.ModelSerializer):
             "user_name",
             "created_at"
         ]
+
+class CreatePaymentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Payment
+        fields = [
+            "name",
+            "accounts",
+            "created_by"
+        ]

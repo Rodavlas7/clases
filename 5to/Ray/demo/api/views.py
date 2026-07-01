@@ -55,3 +55,6 @@ class ListPaymentApiView(generics.ListAPIView):
 class DetailPaymentApiView(generics.RetrieveAPIView):
     queryset = models.Payment.objects.all()
     serializer_class = serializers.DetailPaymentSerializer
+
+class CreatePaymentApiView(generics.CreateAPIView):
+    serializer_class = serializers.CreatePaymentSerializer

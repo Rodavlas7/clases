@@ -17,4 +17,5 @@ urlpatterns = [
     path('v2/account/detail/<int:pk>', views.DetailAccountApiView.as_view(), name="detail_account"),
     path('v2/payment/list/', views.ListPaymentApiView.as_view(), name="list_payment"),
     path('v2/payment/detail/<int:pk>', views.DetailPaymentApiView.as_view(), name="detail_payment"),
+    path('v2/payment/create/', views.CreatePaymentApiView.as_view(), name="create_payment"),
 ]
