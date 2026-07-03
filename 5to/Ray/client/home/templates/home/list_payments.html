@@ -3,7 +3,7 @@
 {% block title %}LIST Payments VIEW{% endblock %}
 
 {% block content %}
-<a href="#" class="btn btn-outline-success form-control">Create Payment</a>
+<a href="{% url 'home:create_payment' %}" class="btn btn-outline-success form-control">Create Payment</a>
     <table class="table table-striped">
         <thead>
             <tr>
