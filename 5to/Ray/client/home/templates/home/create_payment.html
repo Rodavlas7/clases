@@ -23,4 +23,10 @@
 
         <button type="submit" class="btn btn-outline-success">Create Payment</button>
         <a href="{% url 'home:list_payments' %}" class="btn btn-outline-warning">Cancel</a> </form>
-{% endblock %}
+
+
+    {% for account in accounts %}
+        <input type="checkbox" name="accounts" value="{{account.id}}" id="accounts{{ account.id }}">
+        <label for="accounts{{ account.id }}">{{account.name}}</label> <br> <br>
+    {% endfor %}
+{% endblock content%}

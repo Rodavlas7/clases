@@ -4,10 +4,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
 from api import serializers
+from api.banxico_services import BanxicoService
 
 from django.contrib.auth.models import User
 
 # Create your views here.
+
+class TipoCambioApiView(APIView):
+    def get(self, request):
+        data = BanxicoService.get_tipo_cambio()
+        return Response(data)
 
 class UserListApiVIew(APIView):
     def get(self, request):
@@ -58,3 +64,4 @@ class DetailPaymentApiView(generics.RetrieveAPIView):
 
 class CreatePaymentApiView(generics.CreateAPIView):
     serializer_class = serializers.CreatePaymentSerializer
+

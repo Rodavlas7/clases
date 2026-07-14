@@ -123,17 +123,40 @@ class DeleteBankApiView(generic.View):
         return redirect("home:list_banks")
     
 class ListPaymentApiView(generic.View):
+    # These are safe as class attributes because they are constants
     template_name = 'home/list_payments.html'
-    context = {}
     url_base = "http://127.0.0.1:8001/api/v2/payment/list/"
-    response = {}
+    url_tc = "http://127.0.0.1:8001/api/v2/tipo_cambio/dolar/pesos"
 
     def get(self, request):
-        self.response = requests.get(url=self.url_base).json()
-        self.context = {
-            "payments": self.response
+        # 1. Initialize local variables to avoid state leakage across requests
+        payments_data = {}
+        tipo_cambio_data = {}
+        self.headers = {
+            "Authorization": f"Token 1b1594377fcff65694e8a03c86c48b61c3c3de98" if hasattr(request.user, 'auth_token') else ""
         }
-        return render(request, self.template_name, self.context)
+
+        # 2. Safely fetch Payments
+        try:
+            res_payments = requests.get(url=self.url_base, timeout=5, headers=self.headers)
+            res_payments.raise_for_status()
+            payments_data = res_payments.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to fetch payments: {e}")
+
+        try:
+            res_tc = requests.get(url=self.url_tc, timeout=5)
+            res_tc.raise_for_status() 
+            tipo_cambio_data = res_tc.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to fetch tipo cambio: {e}")
+
+        context = {
+            "payments": payments_data,
+            "tipo_cambio": tipo_cambio_data
+        }
+        
+        return render(request, self.template_name, context)
     
 class DetailPaymentApiView(generic.View):
     template_name = 'home/detail_payment.html'
@@ -155,6 +178,7 @@ class CreatePaymentApiView(generic.View):
     response = None
 
     def get(self, request):
+        self.context['accounts'] = requests.get(url=self.url_accounts).json()
         return render(request, self.template_name, self.context)
     
     

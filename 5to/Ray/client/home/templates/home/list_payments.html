@@ -3,6 +3,10 @@
 {% block title %}LIST Payments VIEW{% endblock %}
 
 {% block content %}
+{{tipo_cambio}}
+{% for tc in tipo_cambio.bmx.series %}
+    {{tc.datos.0.fecha}}: {{tc.datos.0.dato}}
+{% endfor %}
 <a href="{% url 'home:create_payment' %}" class="btn btn-outline-success form-control">Create Payment</a>
     <table class="table table-striped">
         <thead>

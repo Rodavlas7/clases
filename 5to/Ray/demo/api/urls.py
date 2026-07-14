@@ -1,5 +1,4 @@
 from django.urls import path
-
 from api import views
 
 app_name = "api"
@@ -18,4 +17,5 @@ urlpatterns = [
     path('v2/payment/list/', views.ListPaymentApiView.as_view(), name="list_payment"),
     path('v2/payment/detail/<int:pk>', views.DetailPaymentApiView.as_view(), name="detail_payment"),
     path('v2/payment/create/', views.CreatePaymentApiView.as_view(), name="create_payment"),
+    path('v2/tipo_cambio/dolar/pesos', views.TipoCambioApiView.as_view(), name="tipo_cambio_dolar_peso"),
 ]
