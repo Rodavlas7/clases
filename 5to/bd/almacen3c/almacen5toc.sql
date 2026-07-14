@@ -574,7 +574,175 @@ BEGIN
     SET NEW.importe = NEW.cantidad * vPrecio;
 
 END$$
+DELIMITER;
 
+
+-- Para saber que productos no se encuentran en una sucursal específica
+select 
+    a.producto as producto,
+    p.nombre as nombre,
+    p.precio as precio
+from almacen as a
+inner join producto as p on a.producto = p.codigo 
+where p.codigo not in (
+    select 
+        producto 
+    from almacen 
+    WHERE sucursal = 'QUICA')
+GROUP BY producto;
+
+
+
+/*
+
+    4. Realizar el trigger para que se actualice el stock
+        despues de que se registre un producto en un pedido
+
+*/
+
+DELIMITER $$
+CREATE OR REPLACE TRIGGER tg_acualizar_stock_en_pedido
+AFTER INSERT ON ped_prod
+FOR EACH ROW
+BEGIN
+    UPDATE almacen
+    SET stock = stock - NEW.cantidad
+    WHERE sucursal = (
+        SELECT sucursal
+        FROM pedido
+        WHERE num = NEW.pedido
+    )
+    AND productos = NEW.producto;
+END$$
 DELIMITER ;
 
-select * from ;
+
+
+-- Para saber que productos no se encuentran en una sucursal específica
+select 
+    sucursal as sucursal,
+    producto as producto,
+    sum(stock) as stock
+from almacen
+where sucursal = 'QUICA'
+group by sucursal, producto;
+
+insert INTO ped_prod(pedido, producto, cantidad) 
+VALUES (21, 'mabe', 10);
+
+/*
+    5. Calcular los campos calculado de la tabla pedido despues de que se agregue un producto a un pedido
+        -- Subtotal
+        -- IVA
+        -- Total
+*/
+DELIMITER $$
+CREATE OR REPLACE TRIGGER tg_calcular_campos_pedido
+AFTER INSERT ON ped_prod
+FOR EACH ROW
+BEGIN
+
+    declare importeProductos float;
+    declare candtidadProductos;
+
+    SELECT 
+        SUM(importe) into importeProductos,
+        SUM(cantidad) into candtidadProductos
+    FROM ped_prod 
+    WHERE pedido = NEW.pedido;
+
+    UPDATE pedido
+    SET cantTotalProd = candtidadProductos,
+        subtotal = importeProductos,
+        iva = importeProductos * 0.16,
+        total = importeProductos * 1.16,
+        totalConInt = importeProductos * 1.16 * 1.10
+    WHERE num = NEW.pedido;
+
+end$$
+DELIMITER;
+
+
+DELIMITER $$
+CREATE OR REPLACE TRIGGER tg_calcular_campos_pedido
+AFTER INSERT ON ped_prod
+FOR EACH ROW
+BEGIN
+
+    UPDATE pedido
+    SET cantTotalProd = cantTotalProd + new.cantidad,
+        total = total + new.importe*1.16,
+        iva = total * 0.16
+        subtotal = total - iva
+        totalConInt = total * 1.10
+    WHERE num = NEW.pedido;
+
+end$$
+DELIMITER;
+
+/*
+
+    Trigger tabla pago
+    - Actualizar el numero de pago
+    - Actualizar el saldo verificando si es el primero o en base a los pagos que se han realizado
+    - Actualizar el estado del pedido a pagado si el saldo es 0
+
+*/
+
+DELIMITER $$
+CREATE OR REPLACE TRIGGER tg_calcular_verificar_pago
+BEFORE INSERT ON PAGO
+FOR EACH ROW
+BEGIN
+
+
+    declare CantidadPagos INT;
+
+    SELECT 
+        COUNT(*) into CantidadPagos 
+    from pago 
+    where pedido = NEW.pedido;
+    
+    SET new.fecha = CURRENT_TIMESTAMP;
+
+    if new.montoPago <= 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'El monto del pago debe ser mayor a 0';
+    END IF;
+
+    if CantidadPagos = 0 THEN
+        SET new.saldo = (SELECT totalConInt from pedido where num = NEW.pedido);
+        SET new.numPago = 1;
+    else
+        SET new.saldo = (Select saldo from pago WHERE pedido = new.pedido and numPago = CantidadPagos);
+        SET new.numPago = CantidadPagos + 1;
+    END IF;
+
+    if new.montoPago > new.saldo THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'El monto del pago no puede ser mayor al saldo del pedido';
+    ELSE
+        SET new.saldo = new.saldo - new.montoPago;
+    END IF;
+
+end$$
+DELIMITER;
+
+
+
+
+UPDATE pedido p
+JOIN (
+    SELECT
+        pedido,
+        SUM(cantidad) AS total_productos,
+        SUM(importe) AS subtotal
+    FROM ped_prod
+    GROUP BY pedido
+) pp
+ON p.num = pp.pedido
+SET
+    p.cantTotalProd = pp.total_productos,
+    p.subtotal = pp.subtotal,
+    p.IVA = pp.subtotal * 0.16,
+    p.total = pp.subtotal * 1.16;
