@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+
+{% block title %}LIST SERVICIO VIEW{% endblock %}
+
+{% block content %}
+<a href="{% url 'home:create_servicio' %}" class="btn btn-outline-success form-control mb-3">Create Servicio</a>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>CAPACIDAD</th>
+                <th>COSTO</th>
+                <th>STATUS</th>
+                <th>ACTIONS</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.id }}</td>
+                <td>{{ servicio.nombre }}</td>
+                <td>{{ servicio.capacidad }}</td>
+                <td>{{ servicio.costo }}</td>
+                <td>{{ servicio.estado }}</td>
+                <td>
+                    <a href="{% url 'home:detail_servicio' servicio.id %}" class="btn btn-outline-info btn-sm">Detail</a>
+                    <a href="{% url 'home:update_servicio' servicio.id %}" class="btn btn-outline-warning btn-sm">Update</a>
+                    <a href="{% url 'home:delete_servicio' servicio.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+{% endblock %}

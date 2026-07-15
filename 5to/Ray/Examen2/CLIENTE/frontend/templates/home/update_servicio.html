@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+
+{% block title %}UPDATE SERVICIO{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Servicio #{{ servicio.id }}</h2>
+    <hr>
+    <form method="POST" action="">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre del Servicio</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="{{ servicio.nombre }}" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="capacidad" class="form-label">Capacidad</label>
+            <input type="number" class="form-control" id="capacidad" name="capacidad" value="{{ servicio.capacidad }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="costo" class="form-label">Costo</label>
+            <input type="number" step="0.01" class="form-control" id="costo" name="costo" value="{{ servicio.costo }}" required>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="estado" name="estado" {% if servicio.estado %}checked{% endif %}>
+            <label class="form-check-label" for="estado">¿Servicio Activo?</label>
+        </div>
+        
+        <button type="submit" class="btn btn-warning">Actualizar Cambios</button>
+        <a href="{% url 'home:list_servicio' %}" class="btn btn-secondary">Cancelar</a>        
+    </form>
+</div>
+{% endblock %}

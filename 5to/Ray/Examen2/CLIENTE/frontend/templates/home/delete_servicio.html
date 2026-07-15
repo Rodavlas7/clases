@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+
+{% block title %}DELETE SERVICIO{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">¡Advertencia!</h4>
+        <p>¿Estás completamente seguro de que deseas eliminar el servicio <strong>"{{ servicio.nombre }}"</strong>?</p>
+        <hr>
+        <p class="mb-0">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <form method="POST" action="">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Sí, eliminar permanentemente</button>
+        <a href="{% url 'home:list_servicio' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
