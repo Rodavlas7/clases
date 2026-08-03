@@ -53,3 +53,44 @@ DELIMITER;
 call sp_prodxsucursal('CACHA');
 
 SELECT codigo from sucursal;
+
+
+/*
+Cantidad de ventas de un vendedor
+nombre del vendedor
+cantidad de ventas
+*/
+
+
+SELECT 
+CONCAT(rv.nombre, ' ', rv.`primerApell`, ' ', IFNULL(rv.`segApell`, "")) as Vendedor,
+COUNT(*) as Ventas
+FROM pedido as p
+INNER JOIN rep_vtas as rv on p.rep_vtas = rv.num
+where p.rep_vtas = 3
+;
+
+DROP PROCEDURE IF EXISTS sp_ventasxvendedor;
+DELIMITER $$
+
+    CREATE PROCEDURE sp_ventasxvendedor
+    (
+        in numVendedor INTEGER,
+        out nombreVend VARCHAR(92),
+        out numVentas INTEGER
+    )
+        SELECT 
+            CONCAT(rv.nombre, ' ', rv.`primerApell`, ' ', IFNULL(rv.`segApell`, "")),
+            COUNT(*)
+            into nombreVend, numVentas
+        FROM pedido as p
+        INNER JOIN rep_vtas as rv on p.rep_vtas = rv.num
+        where p.rep_vtas = numVendedor;
+    END$$
+
+DELIMITER;
+call sp_ventasxvendedor(11, @vendedor, @numeroVentas)
+SELECT @vendedor AS NombreVendedor, @numeroventas AS NumeroVentas;
+
+
+SELECT * from edo_pedido;
