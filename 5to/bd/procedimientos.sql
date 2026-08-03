@@ -89,7 +89,7 @@ DELIMITER $$
     END$$
 
 DELIMITER;
-call sp_ventasxvendedor(11, @vendedor, @numeroVentas)
+call sp_ventasxvendedor(3, @vendedor, @numeroVentas);
 SELECT @vendedor AS NombreVendedor, @numeroventas AS NumeroVentas;
 
 
