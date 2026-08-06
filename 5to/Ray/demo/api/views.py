@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from api import serializers
 from api.banxico_services import BanxicoService
 
@@ -65,3 +66,8 @@ class DetailPaymentApiView(generics.RetrieveAPIView):
 class CreatePaymentApiView(generics.CreateAPIView):
     serializer_class = serializers.CreatePaymentSerializer
 
+class CreateUserApiView(generics.CreateAPIView):
+    serializer_class = serializers.CreateUserSerializer
+    queryset = User.objects.all()
+    permission_classes = [AllowAny]
+    authentication_classes = []
