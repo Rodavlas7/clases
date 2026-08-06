@@ -94,3 +94,48 @@ SELECT @vendedor AS NombreVendedor, @numeroventas AS NumeroVentas;
 
 
 SELECT * from edo_pedido;
+
+
+
+/*
+
+Calcular comisiones de un vendedor de un mes y de una año
+
+*/
+
+
+
+DROP PROCEDURE IF EXISTS sp_calcular_comisiones;
+DELIMITER $$
+
+    CREATE PROCEDURE sp_calcular_comisiones
+    (
+        in vendedor INTEGER,
+        INOUT comision FLOAT,
+        in mes INTEGER,
+        in ano INTEGER
+    )
+    BEGIN
+    DECLARE montoDeLasVentas FLOAT;
+
+    SELECT 
+        sum(montoVentas)/0.20 into montoDeLasVentas
+    FROM meta
+    WHERE repVtas = vendedor and 
+          MONTH(fechaInicio) = mes and 
+          YEAR(fechaInicio) = ano;
+
+    set comision = ROUND(montoDeLasVentas * comision,3);
+
+    END$$
+
+DELIMITER;
+
+set @comision = 0.2;
+call sp_calcular_comisiones(11, @comision, 1, 2025);
+SELECT @comision;
+
+SELECT 
+ROUND( sum(montoVentas)/0.20 , 3 ) as Comision
+FROM meta
+WHERE repVtas = 11 and MONTH(fechaInicio) = 1 and YEAR(fechaInicio) = 2025;
