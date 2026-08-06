@@ -53,3 +53,89 @@ DELIMITER;
 call sp_prodxsucursal('CACHA');
 
 SELECT codigo from sucursal;
+
+
+/*
+Cantidad de ventas de un vendedor
+nombre del vendedor
+cantidad de ventas
+*/
+
+
+SELECT 
+CONCAT(rv.nombre, ' ', rv.`primerApell`, ' ', IFNULL(rv.`segApell`, "")) as Vendedor,
+COUNT(*) as Ventas
+FROM pedido as p
+INNER JOIN rep_vtas as rv on p.rep_vtas = rv.num
+where p.rep_vtas = 3
+;
+
+DROP PROCEDURE IF EXISTS sp_ventasxvendedor;
+DELIMITER $$
+
+    CREATE PROCEDURE sp_ventasxvendedor
+    (
+        in numVendedor INTEGER,
+        out nombreVend VARCHAR(92),
+        out numVentas INTEGER
+    )
+        SELECT 
+            CONCAT(rv.nombre, ' ', rv.`primerApell`, ' ', IFNULL(rv.`segApell`, "")),
+            COUNT(*)
+            into nombreVend, numVentas
+        FROM pedido as p
+        INNER JOIN rep_vtas as rv on p.rep_vtas = rv.num
+        where p.rep_vtas = numVendedor;
+    END$$
+
+DELIMITER;
+call sp_ventasxvendedor(3, @vendedor, @numeroVentas);
+SELECT @vendedor AS NombreVendedor, @numeroventas AS NumeroVentas;
+
+
+SELECT * from edo_pedido;
+
+
+
+/*
+
+Calcular comisiones de un vendedor de un mes y de una año
+
+*/
+
+
+
+DROP PROCEDURE IF EXISTS sp_calcular_comisiones;
+DELIMITER $$
+
+    CREATE PROCEDURE sp_calcular_comisiones
+    (
+        in vendedor INTEGER,
+        INOUT comision FLOAT,
+        in mes INTEGER,
+        in ano INTEGER
+    )
+    BEGIN
+    DECLARE montoDeLasVentas FLOAT;
+
+    SELECT 
+        sum(montoVentas)/0.20 into montoDeLasVentas
+    FROM meta
+    WHERE repVtas = vendedor and 
+          MONTH(fechaInicio) = mes and 
+          YEAR(fechaInicio) = ano;
+
+    set comision = ROUND(montoDeLasVentas * comision,3);
+
+    END$$
+
+DELIMITER;
+
+set @comision = 0.2;
+call sp_calcular_comisiones(11, @comision, 1, 2025);
+SELECT @comision;
+
+SELECT 
+ROUND( sum(montoVentas)/0.20 , 3 ) as Comision
+FROM meta
+WHERE repVtas = 11 and MONTH(fechaInicio) = 1 and YEAR(fechaInicio) = 2025;
