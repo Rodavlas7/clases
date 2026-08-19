@@ -13,4 +13,5 @@ urlpatterns = [
     path('payment/list/',views.ListPaymentApiView.as_view(),name='list_payments'),
     path('payment/detail/<int:pk>/', views.DetailPaymentApiView.as_view(), name='detail_payment'),
     path('payment/create/', views.CreatePaymentApiView.as_view(), name='create_payment'),
+    path('user/create/', views.UserCreateView.as_view(), name='user_create'),
 ]

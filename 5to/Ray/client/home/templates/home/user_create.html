@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+
+{% block title %}
+    Create User
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 50px;" style="margin-bottom: 50px;" style="margin-left: 50px;" style="margin-right: 50px;" style="padding: 50px; style="grid-template-columns: 1fr 1fr; style="gap: 20px; style="align-items: center; style="justify-content: center;">
+    <form action="" method="post">
+        {% csrf_token %}
+        <label for="username">Username:</label>
+        <input type="text" name="username" id="username">
+        <br>
+        <label for="first_name">First Name:</label>
+        <input type="text" name="first_name" id="first_name">
+        <br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" name="last_name" id="last_name">
+        <br>
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email">
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password">
+        <br>
+        <label for="password_confirm">Confirm Password:</label>
+        <input type="password" name="password_confirm" id="password_confirm">
+        <br>
+        <button type="submit" class="btn btn-outline-success">Create User</button>
+
+        <a href="{% url 'home:index' %}" class="btn btn-outline-warning">Cancel</a> </form>
+</div>
+{% endblock %}

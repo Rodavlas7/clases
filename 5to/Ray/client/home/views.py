@@ -16,7 +16,29 @@ class Index(generic.View):
             "banks" : self.response
         }
         return render(request, self.template_name, self.context)
-    
+
+
+class UserCreateView(generic.View):
+    template_name = 'home/user_create.html'
+    context = {}
+    response = None
+    url_post = "http://127.0.0.1:8001/api/v1/signup/"
+    payload = {}
+
+
+    def get(self, request):
+        return render(request, self.template_name, self.context)
+
+    def post(self, request):
+
+        self.payload = {
+            "username": request.POST.get("username"),
+            "email": request.POST.get("email"),
+            "password": request.POST.get("password")
+        }
+
+        self.response = requests.post(url=self.url_post, json=self.payload).json()
+        return redirect("home:index")
 
 ### BANKS VIEWS
 
