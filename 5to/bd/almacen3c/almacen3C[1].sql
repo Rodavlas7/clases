@@ -1,5 +1,6 @@
--- Active: 1762888131509@@127.0.0.1@3306@almacen3c
+-- Active: 1762888131509@@127.0.0.1@3306@cuatro
 -- Creacion de la base de datos ALMACEN
+Create DATABASE if NOT EXISTS almacen3c ;
 use almacen3C;
 
 -- crear las tablas

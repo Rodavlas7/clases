@@ -34,7 +34,10 @@ call sp_cantidad_pedidos_cliente_inner();
 
 
 DELIMITER $$
-create Procedure sp_prodxsucursal(in suc varchar(5))
+create Procedure sp_prodxsucursal
+(
+    in suc varchar(5)
+)
 begin
 
     select
@@ -77,7 +80,7 @@ DELIMITER $$
     (
         in numVendedor INTEGER,
         out nombreVend VARCHAR(92),
-        out numVentas INTEGER
+        out      INTEGER
     )
         SELECT 
             CONCAT(rv.nombre, ' ', rv.`primerApell`, ' ', IFNULL(rv.`segApell`, "")),
